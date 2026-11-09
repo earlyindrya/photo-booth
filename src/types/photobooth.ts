@@ -1,6 +1,12 @@
 export type StepId = 'start' | 'layout' | 'camera' | 'customize' | 'download';
 
-export type LayoutId = 'classic-4cut' | 'grid-2x2' | 'cinematic-wide' | 'event-edition';
+export type LayoutId = 
+  | 'classic-4cut' 
+  | 'zine-moodboard' 
+  | 'mac-window-strip' 
+  | 'vintage-baroque' 
+  | 'grid-2x2' 
+  | 'cinematic-wide';
 
 export interface LayoutConfig {
   id: LayoutId;
@@ -16,11 +22,12 @@ export interface LayoutConfig {
 
 export type FilterId = 
   | 'normal' 
-  | 'bw-noir' 
-  | 'neon-cyber' 
-  | 'retro-vintage' 
-  | 'soft-aesthetic' 
-  | 'high-contrast';
+  | 'warm-natural'
+  | 'april-dream' 
+  | 'vintage-ugc' 
+  | 'noir-editorial' 
+  | 'capsule-sky' 
+  | 'retro-90s';
 
 export interface FilterConfig {
   id: FilterId;
@@ -31,12 +38,15 @@ export interface FilterConfig {
 }
 
 export type FrameThemeId = 
-  | 'obsidian' 
-  | 'clean-white' 
-  | 'neon-violet' 
-  | 'pastel-pink' 
-  | 'gradient-cyber' 
-  | 'hologram';
+  | 'cream-paper' 
+  | 'retro-stripes' 
+  | 'y2k-mac' 
+  | 'zine-cherry' 
+  | 'sky-capsule' 
+  | 'baroque-gold' 
+  | 'studio-noir';
+
+export type FontStyleId = 'serif' | 'sans' | 'script' | 'mono';
 
 export interface FrameThemeConfig {
   id: FrameThemeId;
@@ -46,6 +56,7 @@ export interface FrameThemeConfig {
   textColor: string;
   subtextColor: string;
   borderClass: string;
+  accentBadge?: string;
 }
 
 export interface CapturedShot {
@@ -64,6 +75,7 @@ export interface StickerItem {
 
 export interface CustomizationSettings {
   theme: FrameThemeId;
+  fontStyle: FontStyleId;
   title: string;
   subtitle: string;
   showDateStamp: boolean;

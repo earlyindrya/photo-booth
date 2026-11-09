@@ -35,7 +35,7 @@ export const Modal: React.FC<ModalProps> = ({
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6">
       {/* Backdrop */}
       <div 
-        className="fixed inset-0 bg-black/80 backdrop-blur-md transition-opacity duration-300"
+        className="fixed inset-0 bg-stone-900/40 backdrop-blur-sm transition-opacity duration-300"
         onClick={() => {
           soundManager.playClick();
           onClose();
@@ -43,11 +43,11 @@ export const Modal: React.FC<ModalProps> = ({
       />
 
       {/* Modal Dialog */}
-      <div className="relative w-full max-w-lg glass-panel-glow rounded-3xl p-6 sm:p-8 z-10 border border-violet-500/30 text-white shadow-2xl transition-all transform scale-100 animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex items-center justify-between pb-4 border-b border-white/10 mb-6">
+      <div className="relative w-full max-w-lg bg-[#FAF8F5] rounded-3xl p-6 sm:p-8 z-10 border border-stone-200/90 text-zinc-900 shadow-capsule-lg transition-all transform scale-100 animate-in fade-in zoom-in-95 duration-200">
+        <div className="flex items-center justify-between pb-3.5 border-b border-stone-200/80 mb-5">
           {title && (
-            <h3 className="text-xl font-bold font-['Space_Grotesk'] text-slate-100 flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+            <h3 className="text-lg font-bold font-serif text-zinc-900 flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-[#8B1E27]" />
               {title}
             </h3>
           )}
@@ -56,14 +56,14 @@ export const Modal: React.FC<ModalProps> = ({
               soundManager.playClick();
               onClose();
             }}
-            className="p-2 rounded-full text-slate-400 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-1.5 rounded-full text-zinc-500 hover:text-zinc-900 hover:bg-zinc-200/60 transition-colors"
             aria-label="Close modal"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
-        <div className="text-slate-200">
+        <div className="text-zinc-700">
           {children}
         </div>
       </div>

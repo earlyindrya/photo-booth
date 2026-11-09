@@ -9,15 +9,16 @@ import { CustomizeScreen } from './components/screens/CustomizeScreen';
 import { DownloadScreen } from './components/screens/DownloadScreen';
 
 const DEFAULT_SETTINGS: CustomizationSettings = {
-  theme: 'obsidian',
-  title: 'FREQZ PHOTOBOOTH',
-  subtitle: 'CAPTURE THE MOMENT',
+  theme: 'cream-paper',
+  fontStyle: 'serif',
+  title: 'things i loved',
+  subtitle: '(monthly recap)',
   showDateStamp: true,
   showWatermark: true,
   frameBorderRadius: 10,
   stickers: [
-    { id: 'default-1', emoji: '✨', x: 88, y: 8, size: 28 },
-    { id: 'default-2', emoji: '💖', x: 12, y: 92, size: 28 },
+    { id: 'default-1', emoji: '🔴', x: 86, y: 10, size: 22 },
+    { id: 'default-2', emoji: '☕', x: 12, y: 92, size: 26 },
   ],
 };
 
@@ -75,7 +76,7 @@ export const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0c] text-slate-100 flex flex-col font-['Outfit',sans-serif]">
+    <div className="min-h-screen bg-[#FAF7F2] text-zinc-900 flex flex-col font-sans selection:bg-[#8B1E27] selection:text-white">
       {/* Top Navigation */}
       <Navbar
         currentStep={currentStep}

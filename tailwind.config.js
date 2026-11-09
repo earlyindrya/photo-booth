@@ -6,40 +6,59 @@ export default {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+        serif: ['"Playfair Display"', 'Georgia', 'serif'],
+        script: ['"Caveat"', 'cursive'],
+        mono: ['"Space Mono"', 'monospace'],
+        display: ['"Space Grotesk"', 'sans-serif'],
+      },
       colors: {
-        cyber: {
-          bg: '#0a0a0c',
-          charcoal: '#0d0d0d',
-          dark: '#121217',
-          surface: '#181820',
-          border: '#262633',
-          purple: '#8B5CF6',
-          pink: '#EC4899',
-          cyan: '#06B6D4',
-          accent: '#A855F7',
+        paper: {
+          50: '#FCFBF9',
+          100: '#FAF7F2',
+          200: '#F5EFE6',
+          300: '#EBE2D5',
+          400: '#D5C9B8',
+          border: '#E8E2D6',
+        },
+        burgundy: {
+          50: '#FDF2F4',
+          100: '#FBE8EC',
+          500: '#A62639',
+          600: '#8B1E27',
+          700: '#6E161E',
+          800: '#541016',
+          900: '#3A090D',
+        },
+        capsule: {
+          blue: '#3B82F6',
+          sky: '#E0EDFB',
+          light: '#F0F6FF',
+          dark: '#1E293B',
+        },
+        vintage: {
+          gold: '#C5A059',
+          goldDark: '#8F7135',
+          goldLight: '#F7E7C4',
+          redDot: '#D92D20',
+          folder: '#60A5FA',
         }
       },
       boxShadow: {
-        'neon-purple': '0 0 25px -5px rgba(139, 92, 246, 0.5)',
-        'neon-pink': '0 0 25px -5px rgba(236, 72, 153, 0.5)',
-        'neon-cyan': '0 0 25px -5px rgba(6, 182, 212, 0.5)',
-        'glow-sm': '0 0 10px rgba(139, 92, 246, 0.3)',
-        'glow-lg': '0 0 35px rgba(236, 72, 153, 0.4), 0 0 15px rgba(6, 182, 212, 0.3)',
+        'capsule': '0 20px 40px -15px rgba(0, 0, 0, 0.07), 0 0 1px 1px rgba(0, 0, 0, 0.05)',
+        'capsule-lg': '0 25px 60px -15px rgba(30, 41, 59, 0.12), 0 0 1px 1px rgba(0, 0, 0, 0.04)',
+        'photo-frame': '0 12px 30px -8px rgba(30, 20, 10, 0.15), 0 2px 6px -1px rgba(0,0,0,0.08)',
+        'vintage-gold': '0 8px 24px -4px rgba(197, 160, 89, 0.35)',
+        'polaroid': '0 14px 28px rgba(0,0,0,0.1), 0 6px 10px rgba(0,0,0,0.06)',
       },
       animation: {
-        'pulse-glow': 'pulseGlow 2.5s infinite ease-in-out',
         'shutter': 'shutterFlash 0.35s ease-out forwards',
         'float': 'floating 4s ease-in-out infinite',
+        'float-slow': 'floating 6s ease-in-out infinite',
+        'subtle-pulse': 'subtlePulse 3s infinite ease-in-out',
       },
       keyframes: {
-        pulseGlow: {
-          '0%, 100%': {
-            boxShadow: '0 0 20px 2px rgba(139, 92, 246, 0.4), 0 0 40px 6px rgba(236, 72, 153, 0.2)'
-          },
-          '50%': {
-            boxShadow: '0 0 35px 8px rgba(139, 92, 246, 0.7), 0 0 60px 15px rgba(236, 72, 153, 0.4)'
-          }
-        },
         shutterFlash: {
           '0%': { opacity: '0.95', backgroundColor: '#ffffff' },
           '100%': { opacity: '0', backgroundColor: '#ffffff' }
@@ -47,6 +66,10 @@ export default {
         floating: {
           '0%, 100%': { transform: 'translateY(0px)' },
           '50%': { transform: 'translateY(-6px)' }
+        },
+        subtlePulse: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.7' }
         }
       }
     },

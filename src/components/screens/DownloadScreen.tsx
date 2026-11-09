@@ -50,13 +50,13 @@ export const DownloadScreen: React.FC<DownloadScreenProps> = ({
         setExportedDataUrl(dataUrl);
         setIsGenerating(false);
 
-        // Sound & celebratory confetti
+        // Sound & celebratory confetti in aesthetic tones
         soundManager.playSuccessChime();
         confetti({
-          particleCount: 80,
-          spread: 70,
+          particleCount: 70,
+          spread: 65,
           origin: { y: 0.6 },
-          colors: ['#8B5CF6', '#EC4899', '#06B6D4', '#ffffff'],
+          colors: ['#8B1E27', '#3B82F6', '#C5A059', '#27272A'],
         });
       })
       .catch((err) => {
@@ -75,7 +75,7 @@ export const DownloadScreen: React.FC<DownloadScreenProps> = ({
     soundManager.playClick();
     const link = document.createElement('a');
     link.href = exportedDataUrl;
-    link.download = `FREQZ-${layout.id}-${Date.now()}.png`;
+    link.download = `CAPSULE-${layout.id}-${Date.now()}.png`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -94,7 +94,6 @@ export const DownloadScreen: React.FC<DownloadScreenProps> = ({
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
     } catch {
-      // Fallback: copy data URL
       await navigator.clipboard.writeText(window.location.href);
       setCopied(true);
       setTimeout(() => setCopied(false), 2500);
@@ -105,15 +104,15 @@ export const DownloadScreen: React.FC<DownloadScreenProps> = ({
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 md:py-12">
       {/* Celebration Header */}
       <div className="text-center max-w-2xl mx-auto mb-10">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-pink-950/60 border border-pink-500/30 text-xs font-semibold text-pink-300 mb-3 animate-float">
-          <Sparkles className="w-4 h-4 text-cyan-400" />
-          <span>YOUR STRIP IS READY TO PRINT & SHARE!</span>
+        <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white border border-stone-200 text-xs font-mono text-stone-600 mb-3 shadow-sm">
+          <Sparkles className="w-3.5 h-3.5 text-[#8B1E27]" />
+          <span>YOUR MEMORY STRIP IS READY</span>
         </div>
-        <h2 className="text-3xl sm:text-5xl font-black font-['Space_Grotesk'] text-white tracking-tight">
-          MEMORIES <span className="text-neon-gradient">PRESERVED</span>
+        <h2 className="text-3xl sm:text-5xl font-serif font-bold text-zinc-900 tracking-tight">
+          Memories <span className="italic font-normal text-[#8B1E27]">curated</span> & preserved.
         </h2>
-        <p className="text-sm sm:text-base text-slate-400 mt-2">
-          High-resolution 300 DPI composite generated. Download directly to your device or scan the QR code for instant mobile access.
+        <p className="text-sm sm:text-base text-stone-600 mt-2 font-sans">
+          High-resolution 300 DPI composite rendered. Lossless print-ready PNG ready to download, copy, or scan to mobile.
         </p>
       </div>
 
@@ -122,11 +121,11 @@ export const DownloadScreen: React.FC<DownloadScreenProps> = ({
         
         {/* Strip Preview Showcase */}
         <div className="lg:col-span-7 flex flex-col items-center justify-center">
-          <div className="relative p-6 sm:p-10 rounded-3xl bg-[#0b0b10] border border-white/10 shadow-[0_0_50px_rgba(139,92,246,0.25)] flex items-center justify-center max-w-full">
+          <div className="relative p-6 sm:p-10 rounded-3xl bg-white/75 backdrop-blur-md border border-stone-200 shadow-capsule-lg flex items-center justify-center max-w-full">
             {isGenerating ? (
               <div className="w-64 h-96 flex flex-col items-center justify-center gap-4 text-center">
-                <div className="w-12 h-12 rounded-full border-4 border-violet-500 border-t-cyan-400 animate-spin" />
-                <span className="text-sm font-semibold text-slate-300">
+                <div className="w-10 h-10 rounded-full border-3 border-stone-300 border-t-zinc-900 animate-spin" />
+                <span className="text-sm font-mono text-stone-500">
                   Rendering 300 DPI Composite...
                 </span>
               </div>
@@ -135,9 +134,9 @@ export const DownloadScreen: React.FC<DownloadScreenProps> = ({
                 <img
                   src={exportedDataUrl}
                   alt="Final Photostrip"
-                  className="rounded-2xl shadow-2xl max-h-[620px] object-contain border border-white/20 select-none"
+                  className="rounded-2xl shadow-polaroid max-h-[620px] object-contain border border-stone-300 select-none"
                 />
-                <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/70 backdrop-blur-md text-[10px] font-mono text-cyan-300 border border-white/10">
+                <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-black/80 backdrop-blur-md text-[10px] font-mono text-white shadow-sm">
                   HD PRINT 300 DPI
                 </div>
               </div>
@@ -145,39 +144,38 @@ export const DownloadScreen: React.FC<DownloadScreenProps> = ({
           </div>
         </div>
 
-        {/* Action Center Sidebar */}
+        {/* Action Center Sidebar (Capsule Cards - Ref 1) */}
         <div className="lg:col-span-5 flex flex-col gap-5">
           {/* Main Download Card */}
-          <div className="glass-panel-glow p-6 sm:p-7 rounded-3xl border border-violet-500/40 flex flex-col gap-4">
+          <div className="paper-card p-6 sm:p-7 rounded-3xl border border-stone-200 flex flex-col gap-4">
             <div>
-              <div className="text-xs font-bold text-pink-400 uppercase tracking-wider mb-1">
+              <div className="text-[11px] font-mono font-bold text-[#8B1E27] uppercase tracking-wider mb-1">
                 Instant Export
               </div>
-              <h3 className="text-xl font-extrabold text-white font-['Space_Grotesk']">
+              <h3 className="text-xl font-serif font-bold text-zinc-900">
                 Save to Your Device
               </h3>
-              <p className="text-xs text-slate-400 mt-1">
-                Lossless PNG format with crisp typography, color frames, and custom stickers.
+              <p className="text-xs text-stone-500 mt-1 font-sans leading-relaxed">
+                Lossless PNG file with crisp editorial typography, archival border tones, and custom stickers.
               </p>
             </div>
 
             <Button
-              variant="cyber"
+              variant="primary"
               size="xl"
-              glow={true}
               icon={<Download className="w-5 h-5" />}
               onClick={handleDownload}
               disabled={isGenerating || !exportedDataUrl}
-              className="w-full justify-center text-base py-4"
+              className="w-full justify-center text-sm py-4"
             >
               Download Photo Strip (PNG)
             </Button>
 
-            <div className="grid grid-cols-2 gap-3 pt-2">
+            <div className="grid grid-cols-2 gap-3 pt-1">
               <Button
                 variant="secondary"
                 size="md"
-                icon={copied ? <Check className="w-4 h-4 text-emerald-400" /> : <Copy className="w-4 h-4" />}
+                icon={copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4 text-stone-600" />}
                 onClick={handleCopyImage}
                 disabled={isGenerating}
                 className="justify-center"
@@ -188,7 +186,7 @@ export const DownloadScreen: React.FC<DownloadScreenProps> = ({
               <Button
                 variant="secondary"
                 size="md"
-                icon={<QrCode className="w-4 h-4 text-cyan-400" />}
+                icon={<QrCode className="w-4 h-4 text-stone-600" />}
                 onClick={() => {
                   soundManager.playClick();
                   setIsQrModalOpen(true);
@@ -202,29 +200,29 @@ export const DownloadScreen: React.FC<DownloadScreenProps> = ({
           </div>
 
           {/* Quick Share / Re-edit card */}
-          <div className="glass-panel p-5 rounded-3xl border border-white/10 flex flex-col gap-3">
+          <div className="bg-white/70 backdrop-blur-md p-5 rounded-3xl border border-stone-200 shadow-sm flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-slate-300">Need adjustments?</span>
+              <span className="text-xs font-semibold text-stone-700">Need adjustments?</span>
               <button
                 onClick={onBackToEdit}
-                className="text-xs text-cyan-400 hover:text-cyan-300 font-semibold underline underline-offset-4"
+                className="text-xs text-[#8B1E27] hover:underline font-semibold"
               >
-                Edit colors or stickers
+                Edit stickers & text
               </button>
             </div>
 
-            <div className="pt-3 border-t border-white/10">
+            <div className="pt-3 border-t border-stone-200">
               <Button
                 variant="outline"
                 size="lg"
-                icon={<RotateCcw className="w-4 h-4 text-pink-400" />}
+                icon={<RotateCcw className="w-4 h-4 text-stone-600" />}
                 onClick={() => {
                   soundManager.playClick();
                   onReset();
                 }}
-                className="w-full justify-center border-white/10 hover:border-violet-500/50 hover:bg-violet-950/20 text-slate-200"
+                className="w-full justify-center text-xs"
               >
-                Take Another Photo (New Session)
+                Start New Session (Clear & Restart)
               </Button>
             </div>
           </div>
@@ -236,69 +234,67 @@ export const DownloadScreen: React.FC<DownloadScreenProps> = ({
       <Modal
         isOpen={isQrModalOpen}
         onClose={() => setIsQrModalOpen(false)}
-        title="Scan for Mobile Access"
+        title="Mobile Access & Camera Roll"
       >
         <div className="flex flex-col items-center text-center p-2">
-          {/* Mock QR Code Graphic */}
-          <div className="p-4 bg-white rounded-2xl shadow-xl mb-4 border-4 border-violet-400">
+          {/* Aesthetic SVG QR Code */}
+          <div className="p-4 bg-white rounded-2xl shadow-md mb-4 border border-stone-200">
             <svg
-              className="w-48 h-48"
+              className="w-44 h-44"
               viewBox="0 0 100 100"
               fill="none"
               xmlns="http://www.w3.org/2000/svg"
             >
-              {/* Artistic SVG QR Code representation */}
               <rect width="100" height="100" fill="white" />
               {/* Corner 1 */}
-              <rect x="10" y="10" width="25" height="25" fill="#0d0d12" rx="3" />
+              <rect x="10" y="10" width="25" height="25" fill="#18181B" rx="3" />
               <rect x="15" y="15" width="15" height="15" fill="white" rx="2" />
-              <rect x="18" y="18" width="9" height="9" fill="#8B5CF6" rx="1.5" />
+              <rect x="18" y="18" width="9" height="9" fill="#8B1E27" rx="1.5" />
 
               {/* Corner 2 */}
-              <rect x="65" y="10" width="25" height="25" fill="#0d0d12" rx="3" />
+              <rect x="65" y="10" width="25" height="25" fill="#18181B" rx="3" />
               <rect x="70" y="15" width="15" height="15" fill="white" rx="2" />
-              <rect x="73" y="18" width="9" height="9" fill="#EC4899" rx="1.5" />
+              <rect x="73" y="18" width="9" height="9" fill="#18181B" rx="1.5" />
 
               {/* Corner 3 */}
-              <rect x="10" y="65" width="25" height="25" fill="#0d0d12" rx="3" />
+              <rect x="10" y="65" width="25" height="25" fill="#18181B" rx="3" />
               <rect x="15" y="70" width="15" height="15" fill="white" rx="2" />
-              <rect x="18" y="73" width="9" height="9" fill="#06B6D4" rx="1.5" />
+              <rect x="18" y="73" width="9" height="9" fill="#8B1E27" rx="1.5" />
 
-              {/* Data matrix dots */}
-              <rect x="42" y="12" width="6" height="6" fill="#0d0d12" />
-              <rect x="52" y="12" width="6" height="6" fill="#0d0d12" />
-              <rect x="42" y="24" width="6" height="6" fill="#0d0d12" />
-              <rect x="52" y="32" width="6" height="6" fill="#8B5CF6" />
+              {/* Data dots */}
+              <rect x="42" y="12" width="6" height="6" fill="#18181B" />
+              <rect x="52" y="12" width="6" height="6" fill="#18181B" />
+              <rect x="42" y="24" width="6" height="6" fill="#18181B" />
+              <rect x="52" y="32" width="6" height="6" fill="#8B1E27" />
               
-              <rect x="12" y="44" width="6" height="6" fill="#0d0d12" />
-              <rect x="24" y="44" width="6" height="6" fill="#EC4899" />
-              <rect x="36" y="44" width="8" height="8" fill="#0d0d12" />
-              <rect x="48" y="44" width="6" height="6" fill="#06B6D4" />
-              <rect x="60" y="44" width="8" height="8" fill="#0d0d12" />
-              <rect x="76" y="44" width="6" height="6" fill="#0d0d12" />
+              <rect x="12" y="44" width="6" height="6" fill="#18181B" />
+              <rect x="24" y="44" width="6" height="6" fill="#8B1E27" />
+              <rect x="36" y="44" width="8" height="8" fill="#18181B" />
+              <rect x="48" y="44" width="6" height="6" fill="#18181B" />
+              <rect x="60" y="44" width="8" height="8" fill="#18181B" />
+              <rect x="76" y="44" width="6" height="6" fill="#18181B" />
 
-              <rect x="44" y="56" width="6" height="6" fill="#0d0d12" />
-              <rect x="56" y="56" width="6" height="6" fill="#8B5CF6" />
-              <rect x="68" y="56" width="6" height="6" fill="#0d0d12" />
-              <rect x="80" y="56" width="6" height="6" fill="#EC4899" />
+              <rect x="44" y="56" width="6" height="6" fill="#18181B" />
+              <rect x="56" y="56" width="6" height="6" fill="#8B1E27" />
+              <rect x="68" y="56" width="6" height="6" fill="#18181B" />
+              <rect x="80" y="56" width="6" height="6" fill="#18181B" />
 
-              <rect x="44" y="68" width="6" height="6" fill="#06B6D4" />
-              <rect x="56" y="76" width="8" height="8" fill="#0d0d12" />
-              <rect x="72" y="68" width="6" height="6" fill="#0d0d12" />
-              <rect x="80" y="80" width="8" height="8" fill="#8B5CF6" />
+              <rect x="44" y="68" width="6" height="6" fill="#18181B" />
+              <rect x="56" y="76" width="8" height="8" fill="#18181B" />
+              <rect x="72" y="68" width="6" height="6" fill="#18181B" />
+              <rect x="80" y="80" width="8" height="8" fill="#8B1E27" />
 
-              {/* Center Icon badge */}
-              <circle cx="50" cy="50" r="10" fill="#0d0d12" />
-              <circle cx="50" cy="50" r="6" fill="#EC4899" />
+              <circle cx="50" cy="50" r="10" fill="#18181B" />
+              <circle cx="50" cy="50" r="6" fill="#8B1E27" />
             </svg>
           </div>
 
-          <p className="text-sm font-bold text-white mb-1 flex items-center gap-1.5">
-            <Smartphone className="w-4 h-4 text-cyan-400" />
+          <p className="text-sm font-bold text-zinc-900 mb-1 flex items-center gap-1.5">
+            <Smartphone className="w-4 h-4 text-[#8B1E27]" />
             Scan with your Phone Camera
           </p>
-          <p className="text-xs text-slate-400 max-w-xs mb-5">
-            Instantly download or save your photostrip directly to your iOS or Android camera roll.
+          <p className="text-xs text-stone-500 max-w-xs mb-4">
+            Directly save your photostrip to your iOS or Android camera roll.
           </p>
 
           <Button
@@ -315,7 +311,7 @@ export const DownloadScreen: React.FC<DownloadScreenProps> = ({
             }}
             className="w-full justify-center"
           >
-            Open in New Tab
+            Open in New Window
           </Button>
         </div>
       </Modal>

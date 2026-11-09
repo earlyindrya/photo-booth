@@ -4,50 +4,107 @@
 
 @layer base {
   body {
-    background-color: #0a0a0c;
+    background-color: #FAF7F2;
+    color: #1F1E1D;
     background-image: 
-      radial-gradient(at 0% 0%, rgba(139, 92, 246, 0.12) 0px, transparent 50%),
-      radial-gradient(at 100% 100%, rgba(236, 72, 153, 0.1) 0px, transparent 50%),
-      radial-gradient(at 50% 50%, rgba(6, 182, 212, 0.05) 0px, transparent 50%);
+      radial-gradient(at 10% 10%, rgba(220, 232, 246, 0.45) 0px, transparent 40%),
+      radial-gradient(at 90% 15%, rgba(245, 235, 224, 0.6) 0px, transparent 45%),
+      radial-gradient(at 85% 85%, rgba(235, 222, 210, 0.5) 0px, transparent 50%),
+      radial-gradient(at 15% 90%, rgba(224, 237, 251, 0.4) 0px, transparent 40%);
     background-attachment: fixed;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
 }
 
-/* Custom sleek scrollbar */
+/* Subtle aesthetic scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #0f0f14;
+  background: #F3EFE7;
 }
 ::-webkit-scrollbar-thumb {
-  background: #2a2a3b;
+  background: #D8D0C3;
   border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #8B5CF6;
+  background: #B8AC9A;
 }
 
-/* Glassmorphism utility */
-.glass-panel {
-  background: rgba(18, 18, 26, 0.75);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.glass-panel-glow {
-  background: rgba(20, 20, 30, 0.8);
+/* Frosted glass capsule utility */
+.glass-capsule {
+  background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(139, 92, 246, 0.3);
-  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0,0,0,0.03);
 }
 
-/* Cyber text gradient */
-.text-neon-gradient {
-  background: linear-gradient(135deg, #EC4899 0%, #8B5CF6 50%, #06B6D4 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+.glass-capsule-dark {
+  background: rgba(28, 28, 33, 0.82);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 16px 36px -12px rgba(0, 0, 0, 0.35);
+}
+
+/* Vintage Paper Card */
+.paper-card {
+  background: #FFFDF9;
+  border: 1px solid #EBE4D8;
+  box-shadow: 0 12px 30px -8px rgba(50, 40, 30, 0.07), 0 2px 6px -1px rgba(0,0,0,0.02);
+}
+
+/* Vintage Ornate Gold Border */
+.baroque-gold-border {
+  border: 4px double #C5A059;
+  outline: 2px solid #8F7135;
+  box-shadow: inset 0 0 10px rgba(197, 160, 89, 0.35), 0 12px 28px rgba(143, 113, 53, 0.2);
+}
+
+/* Retro Awning Stripes Pattern (Baby Blue + Cream - Ref 3) */
+.retro-awning-stripes {
+  background: repeating-linear-gradient(
+    90deg,
+    #D7E5F5 0px,
+    #D7E5F5 18px,
+    #FFFDF9 18px,
+    #FFFDF9 36px
+  );
+}
+
+/* Retro Mac OS Window Bar */
+.mac-window-chrome {
+  background: linear-gradient(180deg, #ECECEC 0%, #D4D4D4 100%);
+  border-bottom: 1px solid #B5B5B5;
+}
+
+/* Washi Tape / Tape Label */
+.tape-label {
+  background: #B9D6F3;
+  color: #172554;
+  font-family: 'Space Mono', monospace;
+  position: relative;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+}
+
+/* Red Polka Dot Sticker (Ref 5) */
+.red-dot-sticker {
+  width: 14px;
+  height: 14px;
+  background-color: #D92D20;
+  border-radius: 9999px;
+  display: inline-block;
+  box-shadow: 0 2px 4px rgba(217, 45, 32, 0.35);
+}
+
+/* White Circle Dot (Ref 2) */
+.white-dot-sticker {
+  width: 16px;
+  height: 16px;
+  background-color: #FFFFFF;
+  border-radius: 9999px;
+  display: inline-block;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.18);
 }

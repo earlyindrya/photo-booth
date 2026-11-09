@@ -7,13 +7,15 @@ import {
   Trash2, 
   ArrowRight, 
   Sparkles,
-  Sliders
+  Sliders,
+  Folder
 } from 'lucide-react';
 import { 
   LayoutConfig, 
   CapturedShot, 
   CustomizationSettings, 
   FrameThemeId, 
+  FontStyleId,
   StickerItem 
 } from '../../types/photobooth';
 import { FRAME_THEMES, STICKER_PALETTE } from '../../utils/mockData';
@@ -46,15 +48,19 @@ export const CustomizeScreen: React.FC<CustomizeScreenProps> = ({
     onUpdateSettings({ ...settings, theme: themeId });
   };
 
+  const handleSelectFont = (fontStyle: FontStyleId) => {
+    soundManager.playClick();
+    onUpdateSettings({ ...settings, fontStyle });
+  };
+
   const handleAddSticker = (emoji: string) => {
     soundManager.playClick();
-    // Place new sticker in a random or centered aesthetic location on the frame
     const newSticker: StickerItem = {
       id: `${Date.now()}-${Math.random()}`,
       emoji,
-      x: 20 + Math.floor(Math.random() * 60),
-      y: 10 + Math.floor(Math.random() * 80),
-      size: 32,
+      x: 18 + Math.floor(Math.random() * 64),
+      y: 12 + Math.floor(Math.random() * 76),
+      size: emoji === '🔴' || emoji === '⚪' ? 22 : 30,
     };
     onUpdateSettings({
       ...settings,
@@ -75,37 +81,44 @@ export const CustomizeScreen: React.FC<CustomizeScreenProps> = ({
     onUpdateSettings({ ...settings, stickers: [] });
   };
 
+  // Font CSS classes based on selected style
+  const fontClass = {
+    serif: "font-serif",
+    sans: "font-sans",
+    script: "font-script text-lg",
+    mono: "font-mono",
+  }[settings.fontStyle || 'serif'];
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
         <div>
           <div className="flex items-center gap-2 mb-1">
-            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 text-xs font-semibold">
-              <Sparkles className="w-3.5 h-3.5" />
-              STEP 3: CUSTOMIZE STRIP
+            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white border border-stone-200 text-stone-700 text-xs font-mono">
+              <Sparkles className="w-3.5 h-3.5 text-[#8B1E27]" />
+              STEP 03: CURATE & CUSTOMIZE
             </span>
-            <span className="text-xs text-slate-400 font-mono">
+            <span className="text-xs text-stone-500 font-mono">
               LAYOUT: {layout.name}
             </span>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold font-['Space_Grotesk'] text-white">
-            FINESSE YOUR <span className="text-neon-gradient">DESIGN</span>
+          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-zinc-900">
+            Finesse your <span className="italic font-normal text-[#8B1E27]">curation</span>.
           </h2>
         </div>
 
         <div className="flex items-center gap-3">
           <Button
-            variant="secondary"
+            variant="outline"
             size="md"
             onClick={onBack}
           >
-            Back to Camera
+            Back to Studio
           </Button>
           <Button
-            variant="cyber"
+            variant="primary"
             size="md"
-            glow={true}
             icon={<ArrowRight className="w-4 h-4" />}
             iconPosition="right"
             onClick={onContinue}
@@ -119,45 +132,54 @@ export const CustomizeScreen: React.FC<CustomizeScreenProps> = ({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         
         {/* Left/Center: Real-time Live WYSIWYG Strip Preview */}
-        <div className="lg:col-span-7 flex flex-col items-center justify-center p-4 sm:p-8 bg-[#0b0b10] rounded-3xl border border-white/10 shadow-2xl relative min-h-[520px]">
-          <div className="text-xs font-mono text-slate-500 mb-3 uppercase tracking-wider flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400" />
-            Real-time WYSIWYG Strip Preview
+        <div className="lg:col-span-7 flex flex-col items-center justify-center p-4 sm:p-8 bg-white/70 backdrop-blur-md rounded-3xl border border-stone-200 shadow-capsule relative min-h-[540px]">
+          <div className="text-xs font-mono text-stone-500 mb-4 uppercase tracking-wider flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-[#8B1E27]" />
+            Real-time WYSIWYG Photostrip
           </div>
 
           {/* Interactive Strip Container */}
           <div
-            className={`relative transition-all duration-300 shadow-2xl rounded-2xl overflow-hidden select-none border ${currentTheme.borderClass} ${currentTheme.bgClass}`}
+            className={`relative transition-all duration-300 shadow-polaroid rounded-2xl overflow-hidden select-none border ${currentTheme.borderClass} ${currentTheme.bgClass} ${
+              settings.theme === 'baroque-gold' || layout.id === 'vintage-baroque' ? 'baroque-gold-border' : ''
+            }`}
             style={{
-              width: layout.id === 'grid-2x2' ? '380px' : layout.id === 'cinematic-wide' ? '460px' : '260px',
+              width: layout.id === 'grid-2x2' ? '390px' : layout.id === 'cinematic-wide' ? '460px' : '275px',
               maxWidth: '100%',
             }}
           >
-            {/* Header (for Event Edition) */}
-            {layout.id === 'event-edition' && (
-              <div className="text-center pt-5 pb-2 px-3">
-                <div
-                  className="font-black text-sm tracking-widest font-['Space_Grotesk']"
-                  style={{ color: currentTheme.textColor }}
-                >
-                  ⚡ CYBER FREQZ ⚡
+            {/* Mac OS Window Header if theme or layout is Y2K (Ref 4) */}
+            {(settings.theme === 'y2k-mac' || layout.id === 'mac-window-strip') && (
+              <div className="mac-window-chrome px-3 py-2 flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#FF5F56] border border-[#E0443E]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#FFBD2E] border border-[#DEA123]" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-[#27C93F] border border-[#1AAB29]" />
                 </div>
-                <div
-                  className="text-[9px] font-semibold tracking-wider opacity-80"
-                  style={{ color: currentTheme.subtextColor }}
-                >
-                  SPECIAL EDITION PHOTOBOOTH
+                <div className="font-mono text-[10px] text-zinc-700 font-semibold truncate px-2">
+                  recap_vol08.strip
                 </div>
+                <Folder className="w-3.5 h-3.5 text-blue-500 fill-blue-500" />
+              </div>
+            )}
+
+            {/* Zine Header if theme or layout is Zine (Ref 5) */}
+            {(settings.theme === 'zine-cherry' || layout.id === 'zine-moodboard') && (
+              <div className="px-4 pt-4 pb-1 flex items-center justify-between">
+                <div className="font-serif italic text-xs font-bold text-[#8B1E27]">
+                  things i loved (recap)
+                </div>
+                <span className="w-3 h-3 rounded-full bg-[#D92D20] shadow-sm" />
               </div>
             )}
 
             {/* Photos Layout Container */}
-            {layout.id === 'classic-4cut' || layout.id === 'event-edition' ? (
-              <div className="p-4 sm:p-5 flex flex-col gap-3">
+            {layout.id === 'classic-4cut' || layout.id === 'mac-window-strip' ? (
+              <div className="p-4 flex flex-col gap-3">
                 {shots.map((shot, idx) => (
                   <div
                     key={shot.id}
-                    className="relative aspect-[4/3] w-full rounded-lg overflow-hidden bg-black/40 border border-white/10 shadow-sm"
+                    className="relative aspect-[4/3] w-full overflow-hidden bg-stone-100 border border-stone-300 shadow-sm"
                     style={{ borderRadius: `${settings.frameBorderRadius}px` }}
                   >
                     <img
@@ -165,16 +187,39 @@ export const CustomizeScreen: React.FC<CustomizeScreenProps> = ({
                       alt={`Shot ${idx + 1}`}
                       className="w-full h-full object-cover"
                     />
+                    {/* Number tag badge in corner (Ref 5) */}
+                    <span className="absolute top-1.5 left-2 text-[9px] font-mono text-zinc-800 bg-white/80 px-1.5 py-0.2 rounded shadow-xs">
+                      ({idx + 1})
+                    </span>
+                  </div>
+                ))}
+              </div>
+            ) : layout.id === 'zine-moodboard' ? (
+              <div className="p-4 flex flex-col gap-3.5">
+                {shots.map((shot, idx) => (
+                  <div
+                    key={shot.id}
+                    className="relative aspect-[4/3] w-full overflow-hidden bg-stone-100 border border-stone-800 shadow-sm"
+                    style={{ borderRadius: `${settings.frameBorderRadius}px` }}
+                  >
+                    <img
+                      src={shot.dataUrl}
+                      alt={`Shot ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                    <span className="absolute bottom-1.5 right-2 text-[10px] font-mono font-bold text-white bg-black/60 px-1.5 py-0.5 rounded">
+                      ({idx + 1})
+                    </span>
                   </div>
                 ))}
               </div>
             ) : layout.id === 'grid-2x2' ? (
-              <div className="p-4 sm:p-5">
+              <div className="p-4">
                 <div className="grid grid-cols-2 gap-2.5 mb-2">
                   {shots.map((shot, idx) => (
                     <div
                       key={shot.id}
-                      className="relative aspect-square w-full rounded-lg overflow-hidden bg-black/40 border border-white/10 shadow-sm"
+                      className="relative aspect-square w-full overflow-hidden bg-stone-100 border border-stone-300 shadow-sm"
                       style={{ borderRadius: `${settings.frameBorderRadius}px` }}
                     >
                       <img
@@ -182,6 +227,9 @@ export const CustomizeScreen: React.FC<CustomizeScreenProps> = ({
                         alt={`Shot ${idx + 1}`}
                         className="w-full h-full object-cover"
                       />
+                      <span className="absolute top-1.5 left-1.5 text-[9px] font-mono text-zinc-800 bg-white/85 px-1 rounded">
+                        ({idx + 1})
+                      </span>
                     </div>
                   ))}
                 </div>
@@ -190,12 +238,12 @@ export const CustomizeScreen: React.FC<CustomizeScreenProps> = ({
               <div className="p-5">
                 {shots[0] && (
                   <div
-                    className="relative aspect-[16/10] w-full rounded-lg overflow-hidden bg-black/40 border border-white/10 shadow-sm"
+                    className="relative aspect-[16/10] w-full overflow-hidden bg-stone-100 border border-stone-300 shadow-sm"
                     style={{ borderRadius: `${settings.frameBorderRadius}px` }}
                   >
                     <img
                       src={shots[0].dataUrl}
-                      alt="Cinematic shot"
+                      alt="Hero shot"
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -204,25 +252,33 @@ export const CustomizeScreen: React.FC<CustomizeScreenProps> = ({
             )}
 
             {/* Footer Typography Area */}
-            <div className="px-4 pb-6 pt-2 text-center">
+            <div className="px-4 pb-5 pt-1 text-center">
               <h4
-                className="font-extrabold text-sm sm:text-base font-['Space_Grotesk'] tracking-wide"
+                className={`text-sm sm:text-base font-bold tracking-tight ${fontClass}`}
                 style={{ color: currentTheme.textColor }}
               >
-                {settings.title || 'FREQZ PHOTOBOOTH'}
+                {settings.title || 'capsule photobooth'}
               </h4>
               <p
-                className="text-xs font-medium opacity-85 mt-0.5"
+                className="text-xs font-medium opacity-85 mt-0.5 font-sans"
                 style={{ color: currentTheme.subtextColor }}
               >
-                {settings.subtitle || 'CAPTURE THE MOMENT'}
+                {settings.subtitle || 'monthly recap • studio moments'}
               </p>
+              
+              {/* Handwritten script sign-off (Ref 2 "smm goza") */}
+              {settings.fontStyle === 'script' && (
+                <div className="font-script text-xl mt-1 select-none" style={{ color: currentTheme.textColor }}>
+                  smm goza • atelier
+                </div>
+              )}
+
               {settings.showDateStamp && (
                 <div
-                  className="text-[10px] font-mono font-bold mt-2 tracking-wider opacity-75"
+                  className="text-[9px] font-mono font-semibold mt-2 tracking-wider opacity-75 uppercase"
                   style={{ color: currentTheme.textColor }}
                 >
-                  • {new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' }).toUpperCase()} •
+                  • {new Date().toLocaleDateString('en-US', { month: 'short', day: '2-digit', year: 'numeric' })} • vol.08
                 </div>
               )}
             </div>
@@ -241,91 +297,91 @@ export const CustomizeScreen: React.FC<CustomizeScreenProps> = ({
                 }}
                 title="Click sticker to remove"
               >
-                <span className="drop-shadow-lg inline-block filter">
+                <span className="drop-shadow-sm inline-block filter">
                   {sticker.emoji}
                 </span>
-                <span className="absolute -top-2 -right-2 bg-rose-600 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                <span className="absolute -top-2 -right-2 bg-stone-900 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
                   <Trash2 className="w-2.5 h-2.5" />
                 </span>
               </div>
             ))}
           </div>
 
-          <div className="text-[11px] text-slate-500 mt-4 flex items-center gap-1.5">
-            <Smile className="w-3.5 h-3.5 text-pink-400" />
-            <span>Click any sticker on the photo strip to delete it</span>
+          <div className="text-[11px] font-mono text-stone-500 mt-4 flex items-center gap-1.5">
+            <Smile className="w-3.5 h-3.5 text-[#8B1E27]" />
+            <span>Click any sticker on the photo strip to remove it</span>
           </div>
         </div>
 
         {/* Right: Customization Controls Panel */}
         <div className="lg:col-span-5 flex flex-col gap-5">
           {/* Tabs */}
-          <div className="flex rounded-2xl bg-[#121218] p-1 border border-white/10">
+          <div className="flex rounded-full bg-stone-200/70 p-1 border border-stone-300">
             <button
               onClick={() => setActiveTab('theme')}
-              className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+              className={`flex-1 py-2 rounded-full text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${
                 activeTab === 'theme'
-                  ? 'bg-violet-600 text-white shadow-md shadow-violet-600/30'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-white text-zinc-900 shadow-sm'
+                  : 'text-stone-600 hover:text-zinc-900'
               }`}
             >
-              <Palette className="w-4 h-4" />
+              <Palette className="w-3.5 h-3.5" />
               <span>Frame Theme</span>
             </button>
             <button
               onClick={() => setActiveTab('text')}
-              className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+              className={`flex-1 py-2 rounded-full text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${
                 activeTab === 'text'
-                  ? 'bg-violet-600 text-white shadow-md shadow-violet-600/30'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-white text-zinc-900 shadow-sm'
+                  : 'text-stone-600 hover:text-zinc-900'
               }`}
             >
-              <Type className="w-4 h-4" />
-              <span>Text & Date</span>
+              <Type className="w-3.5 h-3.5" />
+              <span>Typography</span>
             </button>
             <button
               onClick={() => setActiveTab('stickers')}
-              className={`flex-1 py-2.5 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+              className={`flex-1 py-2 rounded-full text-xs font-semibold transition-all flex items-center justify-center gap-1.5 ${
                 activeTab === 'stickers'
-                  ? 'bg-violet-600 text-white shadow-md shadow-violet-600/30'
-                  : 'text-slate-400 hover:text-white'
+                  ? 'bg-white text-zinc-900 shadow-sm'
+                  : 'text-stone-600 hover:text-zinc-900'
               }`}
             >
-              <Smile className="w-4 h-4" />
+              <Smile className="w-3.5 h-3.5" />
               <span>Stickers ({settings.stickers.length})</span>
             </button>
           </div>
 
           {/* Tab 1: Theme & Color Palette */}
           {activeTab === 'theme' && (
-            <div className="glass-panel p-5 rounded-3xl border border-white/10 flex flex-col gap-4">
-              <h3 className="text-sm font-bold text-white font-['Space_Grotesk'] flex items-center gap-2">
-                <Palette className="w-4 h-4 text-cyan-400" />
-                Select Frame Background Color
+            <div className="paper-card p-5 rounded-3xl border border-stone-200 flex flex-col gap-4">
+              <h3 className="text-xs font-mono font-bold text-stone-700 uppercase tracking-wider flex items-center gap-2">
+                <Palette className="w-3.5 h-3.5 text-[#8B1E27]" />
+                Select Frame Aesthetic Preset
               </h3>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2.5">
                 {FRAME_THEMES.map((theme) => {
                   const isSelected = settings.theme === theme.id;
                   return (
                     <button
                       key={theme.id}
                       onClick={() => handleSelectTheme(theme.id)}
-                      className={`p-3 rounded-2xl flex items-center gap-3 transition-all border text-left ${
+                      className={`p-3 rounded-2xl flex items-center gap-2.5 transition-all border text-left ${
                         isSelected
-                          ? 'bg-[#181826] border-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.3)] scale-[1.02]'
-                          : 'bg-[#121218]/90 hover:bg-[#181826] border-white/10 hover:border-white/20'
+                          ? 'bg-white border-zinc-900 shadow-md ring-1 ring-zinc-900'
+                          : 'bg-white/70 hover:bg-white border-stone-200 hover:border-stone-300'
                       }`}
                     >
                       <div
-                        className={`w-9 h-9 rounded-xl ${theme.bgClass} border border-white/20 shrink-0 shadow-sm`}
+                        className={`w-8 h-8 rounded-xl ${theme.bgClass} border border-stone-300 shrink-0 shadow-xs`}
                       />
                       <div className="min-w-0">
-                        <div className="text-xs font-bold text-slate-100 truncate">
+                        <div className="text-xs font-bold text-zinc-900 truncate">
                           {theme.name}
                         </div>
-                        <div className="text-[10px] text-slate-400">
-                          {isSelected ? 'Active' : 'Click to apply'}
+                        <div className="text-[10px] font-mono text-stone-500">
+                          {theme.accentBadge || 'Theme'}
                         </div>
                       </div>
                     </button>
@@ -334,13 +390,13 @@ export const CustomizeScreen: React.FC<CustomizeScreenProps> = ({
               </div>
 
               {/* Corner Rounding Slider */}
-              <div className="pt-4 border-t border-white/10">
+              <div className="pt-3 border-t border-stone-200">
                 <div className="flex items-center justify-between text-xs mb-2">
-                  <span className="font-semibold text-slate-300 flex items-center gap-1.5">
-                    <Sliders className="w-3.5 h-3.5 text-pink-400" />
-                    Photo Corner Curvature
+                  <span className="font-semibold text-stone-700 flex items-center gap-1.5">
+                    <Sliders className="w-3.5 h-3.5 text-[#8B1E27]" />
+                    Photo Corner Radius
                   </span>
-                  <span className="font-mono text-cyan-400">{settings.frameBorderRadius}px</span>
+                  <span className="font-mono text-zinc-900 font-bold">{settings.frameBorderRadius}px</span>
                 </div>
                 <input
                   type="range"
@@ -353,23 +409,54 @@ export const CustomizeScreen: React.FC<CustomizeScreenProps> = ({
                       frameBorderRadius: Number(e.target.value),
                     })
                   }
-                  className="w-full accent-fuchsia-500 bg-white/10 h-1.5 rounded-lg cursor-pointer"
+                  className="w-full accent-zinc-900 bg-stone-200 h-1.5 rounded-lg cursor-pointer"
                 />
               </div>
             </div>
           )}
 
-          {/* Tab 2: Typography & Date */}
+          {/* Tab 2: Typography & Notes */}
           {activeTab === 'text' && (
-            <div className="glass-panel p-5 rounded-3xl border border-white/10 flex flex-col gap-4">
-              <h3 className="text-sm font-bold text-white font-['Space_Grotesk'] flex items-center gap-2">
-                <Type className="w-4 h-4 text-violet-400" />
-                Customize Frame Typography
+            <div className="paper-card p-5 rounded-3xl border border-stone-200 flex flex-col gap-4">
+              <h3 className="text-xs font-mono font-bold text-stone-700 uppercase tracking-wider flex items-center gap-2">
+                <Type className="w-3.5 h-3.5 text-[#8B1E27]" />
+                Select Font & Strip Titles
               </h3>
 
+              {/* Font Family Selector */}
+              <div>
+                <label className="block text-xs font-semibold text-stone-600 mb-1.5">
+                  Editorial Font Style
+                </label>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { id: 'serif', label: 'Editorial Serif', sub: 'Playfair Display', fontClass: 'font-serif' },
+                    { id: 'sans', label: 'Modern Sans', sub: 'Plus Jakarta', fontClass: 'font-sans' },
+                    { id: 'script', label: 'Handwritten Script', sub: 'smm goza style', fontClass: 'font-script text-base' },
+                    { id: 'mono', label: 'Typewriter Mono', sub: 'Space Mono', fontClass: 'font-mono' }
+                  ].map((font) => (
+                    <button
+                      key={font.id}
+                      onClick={() => handleSelectFont(font.id as FontStyleId)}
+                      className={`p-2.5 rounded-xl border text-left transition-all ${
+                        settings.fontStyle === font.id
+                          ? 'bg-white border-zinc-900 shadow-sm ring-1 ring-zinc-900'
+                          : 'bg-white/60 hover:bg-white border-stone-200'
+                      }`}
+                    >
+                      <div className={`text-xs font-bold text-zinc-900 ${font.fontClass}`}>
+                        {font.label}
+                      </div>
+                      <div className="text-[10px] text-stone-400 font-sans">{font.sub}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Text inputs */}
               <div className="space-y-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1.5">
+                  <label className="block text-xs font-semibold text-stone-600 mb-1">
                     Frame Header / Main Title
                   </label>
                   <input
@@ -379,13 +466,13 @@ export const CustomizeScreen: React.FC<CustomizeScreenProps> = ({
                     onChange={(e) =>
                       onUpdateSettings({ ...settings, title: e.target.value })
                     }
-                    placeholder="e.g. FREQZ PHOTOBOOTH"
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#0f0f14] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-400 transition-colors"
+                    placeholder="e.g. things i loved"
+                    className="w-full px-3.5 py-2 rounded-xl bg-white border border-stone-300 text-zinc-900 text-sm focus:outline-none focus:border-zinc-900 shadow-sm"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-slate-400 mb-1.5">
+                  <label className="block text-xs font-semibold text-stone-600 mb-1">
                     Subtitle / Event Tagline
                   </label>
                   <input
@@ -395,17 +482,17 @@ export const CustomizeScreen: React.FC<CustomizeScreenProps> = ({
                     onChange={(e) =>
                       onUpdateSettings({ ...settings, subtitle: e.target.value })
                     }
-                    placeholder="e.g. CAPTURE THE MOMENT"
-                    className="w-full px-4 py-2.5 rounded-xl bg-[#0f0f14] border border-white/10 text-white text-sm focus:outline-none focus:border-cyan-400 transition-colors"
+                    placeholder="e.g. (april edition)"
+                    className="w-full px-3.5 py-2 rounded-xl bg-white border border-stone-300 text-zinc-900 text-sm focus:outline-none focus:border-zinc-900 shadow-sm"
                   />
                 </div>
 
-                <div className="pt-3 border-t border-white/10 flex items-center justify-between">
+                <div className="pt-2 border-t border-stone-200 flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Calendar className="w-4 h-4 text-pink-400" />
+                    <Calendar className="w-4 h-4 text-[#8B1E27]" />
                     <div>
-                      <div className="text-xs font-bold text-white">Date Stamp Badge</div>
-                      <div className="text-[10px] text-slate-400">Display today's date on the bottom</div>
+                      <div className="text-xs font-bold text-zinc-900">Date Stamp Badge</div>
+                      <div className="text-[10px] text-stone-500">Show date and edition number on strip</div>
                     </div>
                   </div>
                   <button
@@ -416,13 +503,13 @@ export const CustomizeScreen: React.FC<CustomizeScreenProps> = ({
                         showDateStamp: !settings.showDateStamp,
                       });
                     }}
-                    className={`w-12 h-6 rounded-full transition-colors relative ${
-                      settings.showDateStamp ? 'bg-fuchsia-600' : 'bg-white/10'
+                    className={`w-11 h-6 rounded-full transition-colors relative ${
+                      settings.showDateStamp ? 'bg-zinc-900' : 'bg-stone-300'
                     }`}
                   >
                     <span
                       className={`absolute top-1 w-4 h-4 rounded-full bg-white transition-transform ${
-                        settings.showDateStamp ? 'left-7' : 'left-1'
+                        settings.showDateStamp ? 'left-6' : 'left-1'
                       }`}
                     />
                   </button>
@@ -433,54 +520,53 @@ export const CustomizeScreen: React.FC<CustomizeScreenProps> = ({
 
           {/* Tab 3: Stickers Palette */}
           {activeTab === 'stickers' && (
-            <div className="glass-panel p-5 rounded-3xl border border-white/10 flex flex-col gap-4">
+            <div className="paper-card p-5 rounded-3xl border border-stone-200 flex flex-col gap-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-sm font-bold text-white font-['Space_Grotesk'] flex items-center gap-2">
-                  <Smile className="w-4 h-4 text-pink-400" />
-                  Tap to Add Aesthetic Stickers
+                <h3 className="text-xs font-mono font-bold text-stone-700 uppercase tracking-wider flex items-center gap-1.5">
+                  <Smile className="w-3.5 h-3.5 text-[#8B1E27]" />
+                  Aesthetic Stickers Palette
                 </h3>
                 {settings.stickers.length > 0 && (
                   <button
                     onClick={handleClearStickers}
-                    className="text-xs text-rose-400 hover:text-rose-300 font-semibold flex items-center gap-1"
+                    className="text-xs text-[#8B1E27] hover:underline font-semibold flex items-center gap-1"
                   >
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-3 h-3" />
                     Clear all
                   </button>
                 )}
               </div>
 
-              <div className="grid grid-cols-6 gap-2 bg-[#0d0d12] p-3 rounded-2xl border border-white/5">
+              <div className="grid grid-cols-6 gap-2 bg-[#FAF7F2] p-3 rounded-2xl border border-stone-200">
                 {STICKER_PALETTE.map((emoji, index) => (
                   <button
                     key={index}
                     onClick={() => handleAddSticker(emoji)}
-                    className="h-11 rounded-xl bg-white/5 hover:bg-white/15 active:scale-90 text-2xl flex items-center justify-center transition-all hover:shadow-md"
+                    className="h-10 rounded-xl bg-white hover:bg-stone-100 active:scale-90 text-xl flex items-center justify-center transition-all border border-stone-200/80 shadow-xs"
                   >
                     {emoji}
                   </button>
                 ))}
               </div>
 
-              <div className="text-xs text-slate-400 bg-violet-950/20 border border-violet-500/20 p-3 rounded-xl flex items-start gap-2">
-                <Sparkles className="w-4 h-4 text-cyan-400 shrink-0 mt-0.5" />
-                <span>
-                  Tip: Added stickers appear immediately on your strip. You can tap any sticker on the preview to delete it!
+              <div className="text-xs text-stone-600 bg-white border border-stone-200 p-3 rounded-xl flex items-start gap-2 shadow-xs">
+                <span className="text-base">📌</span>
+                <span className="leading-relaxed">
+                  Tap any sticker above to stick it to your photostrip. You can tap placed stickers directly on the preview to delete them!
                 </span>
               </div>
             </div>
           )}
 
-          {/* Quick Continue Card */}
-          <div className="glass-panel-glow p-5 rounded-3xl border border-violet-500/30 flex items-center justify-between">
+          {/* Quick Continue Card (Capsule style) */}
+          <div className="bg-white/90 backdrop-blur-md p-5 rounded-3xl border border-stone-200 shadow-capsule flex items-center justify-between">
             <div>
-              <div className="text-xs font-bold text-cyan-400">DESIGN READY</div>
-              <div className="text-sm font-bold text-white">Export high-resolution PNG</div>
+              <div className="text-[11px] font-mono font-bold text-[#8B1E27] uppercase">Curated & Ready</div>
+              <div className="text-sm font-bold text-zinc-900">Export high-resolution strip</div>
             </div>
             <Button
-              variant="cyber"
-              size="lg"
-              glow={true}
+              variant="primary"
+              size="md"
               icon={<ArrowRight className="w-4 h-4" />}
               iconPosition="right"
               onClick={onContinue}
