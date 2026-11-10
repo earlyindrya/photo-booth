@@ -1,22 +1,16 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { 
-  Camera, 
-  FlipHorizontal, 
-  RotateCw, 
-  Sparkles, 
-  Trash2, 
-  ArrowRight, 
-  Play, 
-  AlertCircle,
+import {
+  FlipHorizontal,
+  RotateCw,
   VideoOff,
-  Check,
-  Tv
+  AlertCircle,
+  RefreshCw,
+  Upload,
 } from 'lucide-react';
 import { LayoutConfig, FilterId, CapturedShot } from '../../types/photobooth';
 import { FILTER_OPTIONS } from '../../utils/mockData';
 import { useWebcam } from '../../hooks/useWebcam';
 import { soundManager } from '../../utils/audio';
-import { Button } from '../common/Button';
 
 interface CameraScreenProps {
   layout: LayoutConfig;
@@ -28,14 +22,21 @@ interface CameraScreenProps {
   onBack: () => void;
 }
 
+// 3 filter modes shown as pills
+const FILTER_PILLS = [
+  { id: 'normal', icon: '∅' },
+  { id: 'soft-glow', icon: '··' },
+  { id: 'disposable-90s', icon: '★' },
+];
+
 export const CameraScreen: React.FC<CameraScreenProps> = ({
   layout,
   capturedShots,
   onAddShot,
-  onRemoveShot,
+  onRemoveShot: _onRemoveShot,
   onRetakeAll,
   onContinue,
-  onBack,
+  onBack: _onBack,
 }) => {
   const {
     videoRef,
@@ -48,46 +49,31 @@ export const CameraScreen: React.FC<CameraScreenProps> = ({
     capturePhoto,
   } = useWebcam();
 
-  const [activeFilterId, setActiveFilterId] = useState<FilterId>('normal');
+  const [activeFilterId, setActiveFilterId] = useState<FilterId>('disposable-90s');
   const [countdown, setCountdown] = useState<number | null>(null);
   const [isFlashing, setIsFlashing] = useState(false);
-  const [isAutoSequence, setIsAutoSequence] = useState(false);
   const countdownTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const activeFilter = FILTER_OPTIONS.find((f) => f.id === activeFilterId) || FILTER_OPTIONS[0];
   const isComplete = capturedShots.length >= layout.shotsCount;
   const currentShotIndex = capturedShots.length;
 
-  // Single snapshot trigger
   const triggerCapture = useCallback(() => {
     setIsFlashing(true);
     soundManager.playShutterSound();
-
-    setTimeout(() => {
-      setIsFlashing(false);
-    }, 280);
+    setTimeout(() => setIsFlashing(false), 280);
 
     const shotDataUrl = capturePhoto(capturedShots.length, activeFilter.cssFilter);
-    const newShot: CapturedShot = {
-      id: Date.now(),
-      dataUrl: shotDataUrl,
-      timestamp: Date.now(),
-    };
-
-    onAddShot(newShot);
+    onAddShot({ id: Date.now(), dataUrl: shotDataUrl, timestamp: Date.now() });
     setCountdown(null);
   }, [capturePhoto, capturedShots.length, activeFilter.cssFilter, onAddShot]);
 
-  // Start 3-2-1 Countdown
   const startCountdown = useCallback(() => {
     if (countdown !== null || isComplete) return;
-
     let count = 3;
     setCountdown(count);
     soundManager.playCountdownTick(false);
-
     if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
-
     countdownTimerRef.current = setInterval(() => {
       count -= 1;
       if (count > 0) {
@@ -101,387 +87,212 @@ export const CameraScreen: React.FC<CameraScreenProps> = ({
     }, 1000);
   }, [countdown, isComplete, triggerCapture]);
 
-  // Clean up timer on unmount
   useEffect(() => {
-    return () => {
-      if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
-    };
+    return () => { if (countdownTimerRef.current) clearInterval(countdownTimerRef.current); };
   }, []);
 
-  // Auto-sequence trigger
-  useEffect(() => {
-    if (isAutoSequence && !isComplete && countdown === null && capturedShots.length > 0) {
-      const autoTimer = setTimeout(() => {
-        startCountdown();
-      }, 1800);
-      return () => clearTimeout(autoTimer);
-    }
-  }, [isAutoSequence, isComplete, countdown, capturedShots.length, startCountdown]);
+  // Handle upload
+  const handleUpload = () => {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*';
+    input.onchange = (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        const dataUrl = ev.target?.result as string;
+        if (dataUrl && !isComplete) {
+          onAddShot({ id: Date.now(), dataUrl, timestamp: Date.now() });
+        }
+      };
+      reader.readAsDataURL(file);
+    };
+    input.click();
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6 md:py-8">
-      {/* Top Banner / Progress Header */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mb-6">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <span className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-white border border-stone-200 text-stone-700 text-xs font-mono">
-              <span className="w-2 h-2 rounded-full bg-[#8B1E27]" />
-              STUDIO SESSION
-            </span>
-            <span className="text-xs text-stone-500 font-mono">
-              FORMAT: {layout.name.toUpperCase()}
-            </span>
+    <div className="max-w-sm mx-auto px-4 py-2 flex flex-col items-center gap-4">
+
+      {/* Illustrated Camera Body */}
+      <div className="relative w-full" style={{ maxWidth: 360 }}>
+        {/* Camera outer shell */}
+        <div className="relative bg-zinc-900 rounded-2xl border-2 border-zinc-800 shadow-2xl overflow-hidden" style={{ paddingTop: '10px', paddingBottom: '10px', paddingLeft: '10px', paddingRight: '10px' }}>
+
+          {/* Top bumps */}
+          <div className="absolute -top-2 left-8 w-6 h-4 bg-zinc-800 rounded-t-md" />
+          <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-8 h-5 bg-zinc-700 rounded-t-md" />
+          <div className="absolute -top-2 right-8 w-6 h-4 bg-zinc-800 rounded-t-md" />
+
+          {/* Red tassel on left */}
+          <div className="absolute -left-1 top-1/3 flex flex-col items-center gap-0.5 z-20">
+            <div className="flex gap-0.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-[#C8201A]" />
+              <div className="w-1.5 h-1.5 rounded-full bg-[#C8201A]" />
+            </div>
+            <div className="flex gap-1 mt-0.5">
+              <div className="w-1 h-1 rounded-full bg-white" />
+              <div className="w-1 h-1 rounded-full bg-white" />
+              <div className="w-1 h-1 rounded-full bg-white" />
+            </div>
+            <div className="w-0.5 h-6 bg-[#C8201A]" />
+            <div className="text-[#C8201A] text-xs">🧧</div>
           </div>
-          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-zinc-900">
-            Capture your <span className="italic font-normal text-[#8B1E27]">moments</span>.
-          </h2>
-        </div>
 
-        {/* Counter Badge (Ref 1 Capsule style) */}
-        <div className="flex items-center gap-3">
-          <div className="bg-white px-4 py-2 rounded-full border border-stone-200 shadow-sm flex items-center gap-3">
-            <div className="text-right">
-              <div className="text-[10px] uppercase font-bold text-stone-400 tracking-wider">Progress</div>
-              <div className="text-base font-black text-zinc-900 font-mono">
-                {Math.min(currentShotIndex, layout.shotsCount)} / {layout.shotsCount}
-              </div>
-            </div>
-            <div className="w-8 h-8 rounded-full bg-[#FAF5EE] text-[#8B1E27] flex items-center justify-center">
-              <Camera className="w-4 h-4" />
-            </div>
-          </div>
-        </div>
-      </div>
+          {/* Inner row: viewfinder + side panel */}
+          <div className="flex gap-2">
+            {/* Viewfinder (video area) */}
+            <div className="relative flex-1 aspect-[4/3] bg-zinc-950 rounded-xl overflow-hidden border border-zinc-700">
+              {/* Flash */}
+              {isFlashing && <div className="absolute inset-0 bg-white z-40 animate-shutter pointer-events-none" />}
 
-      {/* Main Studio Viewport Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        
-        {/* Left/Center: Viewport & Live Camera */}
-        <div className="lg:col-span-8 flex flex-col items-center">
-          
-          {/* Camera Frame Box (Styled as Retro Mac OS Window - Ref 4) */}
-          <div className="relative w-full aspect-[4/3] sm:aspect-[16/10] bg-stone-900 rounded-3xl overflow-hidden border border-stone-300 shadow-capsule-lg flex flex-col group">
-            
-            {/* Mac OS Window Chrome Header (Ref 4) */}
-            <div className="mac-window-chrome px-4 py-2.5 flex items-center justify-between shrink-0 select-none z-20">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-[#FF5F56] border border-[#E0443E]" />
-                <span className="w-3 h-3 rounded-full bg-[#FFBD2E] border border-[#DEA123]" />
-                <span className="w-3 h-3 rounded-full bg-[#27C93F] border border-[#1AAB29]" />
-              </div>
-              <div className="font-mono text-xs text-zinc-700 font-medium flex items-center gap-1.5">
-                <span>booth_studio_live.raw</span>
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              </div>
-              <div className="text-[11px] font-mono text-zinc-500">
-                {activeFilter.name}
-              </div>
-            </div>
-
-            {/* Video Viewport Container */}
-            <div className="relative flex-1 bg-black flex items-center justify-center overflow-hidden">
-              
-              {/* Shutter Flash Animation */}
-              {isFlashing && (
-                <div className="absolute inset-0 bg-white z-40 animate-shutter pointer-events-none" />
-              )}
-
-              {/* Countdown Overlay */}
+              {/* Countdown */}
               {countdown !== null && (
-                <div className="absolute inset-0 z-30 bg-black/40 backdrop-blur-sm flex flex-col items-center justify-center animate-in fade-in">
-                  <span className="text-8xl sm:text-9xl font-serif italic font-bold text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.5)]">
-                    {countdown}
-                  </span>
-                  <span className="text-xs font-mono font-bold tracking-widest text-amber-200 uppercase mt-3">
-                    • STRIKE A POSE •
-                  </span>
+                <div className="absolute inset-0 z-30 bg-black/50 flex items-center justify-center">
+                  <span className="font-dotbooth text-7xl font-bold text-white drop-shadow-lg">{countdown}</span>
                 </div>
               )}
 
-              {/* Live HTML5 Video Element */}
+              {/* Video */}
               <video
                 ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                className={`w-full h-full object-cover transition-all duration-200 ${
-                  isMirrored ? 'scale-x-[-1]' : ''
-                } ${status === 'simulated' ? 'hidden' : 'block'}`}
+                autoPlay playsInline muted
+                className={`w-full h-full object-cover ${isMirrored ? 'scale-x-[-1]' : ''} ${status === 'simulated' ? 'hidden' : 'block'}`}
                 style={{ filter: activeFilter.cssFilter }}
               />
 
-              {/* Fallback Simulator View when camera is simulated */}
+              {/* Simulated / no camera */}
               {status === 'simulated' && (
-                <div 
-                  className="w-full h-full flex flex-col items-center justify-center p-6 text-center bg-gradient-to-tr from-stone-900 via-stone-800 to-zinc-900"
-                  style={{ filter: activeFilter.cssFilter }}
-                >
-                  <div className="w-14 h-14 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center mb-3">
-                    <Tv className="w-7 h-7 text-stone-200" />
-                  </div>
-                  <h3 className="text-lg font-serif font-bold text-white mb-1">Studio Simulator Active</h3>
-                  <p className="text-xs text-stone-300 max-w-sm mb-3">
-                    Using high-definition portrait mock generator with editorial lighting.
+                <div className="w-full h-full flex flex-col items-center justify-center p-4 text-center bg-zinc-900"
+                  style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)' }}>
+                  {/* Stars */}
+                  {['top-4 left-6', 'top-8 right-10', 'top-16 left-16', 'bottom-10 left-8', 'bottom-6 right-6', 'top-20 right-4', 'bottom-16 right-16'].map((pos, i) => (
+                    <span key={i} className={`absolute ${pos} text-xs opacity-80 ${i % 2 === 0 ? 'text-white' : 'text-[#C8201A]'}`}>★</span>
+                  ))}
+                  <p className="text-white/60 text-xs text-center px-4">
+                    Camera is blocked here. Use Upload to add your photos.
                   </p>
-                  <div className="text-[11px] font-mono text-amber-200 bg-black/40 px-3 py-1 rounded-full border border-white/10">
-                    Ready to capture shot #{currentShotIndex + 1}
-                  </div>
                 </div>
               )}
 
-              {/* Selection Bounding Box Handles (Ref 4) */}
-              <div className="absolute inset-6 border border-blue-400/70 pointer-events-none">
-                <span className="absolute -top-1 -left-1 w-2.5 h-2.5 bg-blue-500 border border-white" />
-                <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-blue-500 border border-white" />
-                <span className="absolute -bottom-1 -left-1 w-2.5 h-2.5 bg-blue-500 border border-white" />
-                <span className="absolute -bottom-1 -right-1 w-2.5 h-2.5 bg-blue-500 border border-white" />
-                
-                {/* Tape Label in Viewport (Ref 4) */}
-                <div className="absolute top-2 left-2 tape-label px-2 py-0.5 rounded text-[10px] font-bold">
-                  take #{currentShotIndex + 1} • {layout.name}
+              {/* Error */}
+              {errorMessage && (
+                <div className="absolute top-2 left-2 right-2 z-20 bg-amber-500/90 text-white text-xs px-2 py-1 rounded-lg flex items-center gap-1">
+                  <AlertCircle className="w-3 h-3 shrink-0" />
+                  <span className="truncate">{errorMessage}</span>
                 </div>
-              </div>
+              )}
 
-              {/* Camera Viewport Controls Overlay */}
-              <div className="absolute bottom-4 right-4 flex items-center gap-2 z-20">
-                <button
-                  onClick={toggleMirror}
-                  className="p-2.5 rounded-full bg-white/80 hover:bg-white text-zinc-900 backdrop-blur-md border border-stone-200 shadow-md transition-all"
-                  title={isMirrored ? 'Disable Mirror' : 'Enable Mirror'}
-                >
-                  <FlipHorizontal className="w-4 h-4" />
+              {/* Camera controls overlay */}
+              <div className="absolute bottom-2 right-2 flex gap-1 z-20">
+                <button onClick={toggleMirror} className="p-1.5 rounded-full bg-white/80 text-zinc-900 backdrop-blur-sm" title="Mirror">
+                  <FlipHorizontal className="w-3 h-3" />
                 </button>
-                <button
-                  onClick={toggleFacingMode}
-                  className="p-2.5 rounded-full bg-white/80 hover:bg-white text-zinc-900 backdrop-blur-md border border-stone-200 shadow-md transition-all"
-                  title="Switch Camera (Front/Back)"
-                >
-                  <RotateCw className="w-4 h-4" />
+                <button onClick={toggleFacingMode} className="p-1.5 rounded-full bg-white/80 text-zinc-900 backdrop-blur-sm" title="Flip camera">
+                  <RotateCw className="w-3 h-3" />
                 </button>
                 {status !== 'simulated' && (
-                  <button
-                    onClick={switchToSimulated}
-                    className="p-2.5 rounded-full bg-white/80 hover:bg-white text-amber-700 backdrop-blur-md border border-stone-200 shadow-md transition-all"
-                    title="Switch to Simulator"
-                  >
-                    <VideoOff className="w-4 h-4" />
+                  <button onClick={switchToSimulated} className="p-1.5 rounded-full bg-white/80 text-amber-700 backdrop-blur-sm" title="Simulate">
+                    <VideoOff className="w-3 h-3" />
                   </button>
                 )}
               </div>
+            </div>
 
-              {/* Permission notice */}
-              {errorMessage && (
-                <div className="absolute top-4 left-4 right-4 z-20 bg-amber-500/90 backdrop-blur-md text-white text-xs px-3 py-2 rounded-xl flex items-center gap-2 shadow-lg">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-                  <span>{errorMessage}</span>
+            {/* Right side panel – maroon/dark red with polka dots and lens */}
+            <div className="relative w-16 bg-[#7B1D1D] rounded-xl flex flex-col items-center justify-between py-3 overflow-hidden border border-[#5C1010]"
+              style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.15) 1.5px, transparent 1.5px)', backgroundSize: '8px 8px' }}>
+              {/* Lens holes (small dots) */}
+              <div className="flex flex-col gap-2">
+                <div className="w-3 h-3 rounded-full bg-zinc-900 border border-zinc-700" />
+                <div className="w-3 h-3 rounded-full bg-zinc-900 border border-zinc-700" />
+              </div>
+
+              {/* Bullseye lens */}
+              <div className="w-10 h-10 rounded-full bg-zinc-950 border-2 border-zinc-700 flex items-center justify-center">
+                <div className="w-6 h-6 rounded-full bg-zinc-900 border border-zinc-600 flex items-center justify-center">
+                  <div className="w-3 h-3 rounded-full bg-zinc-800" />
                 </div>
-              )}
-            </div>
-          </div>
+              </div>
 
-          {/* Shutter Trigger Bar (Ref 1 Capsule Pill Style) */}
-          <div className="w-full mt-5 bg-white/90 backdrop-blur-md p-4 rounded-3xl border border-stone-200 shadow-capsule flex flex-col sm:flex-row items-center justify-between gap-4">
-            
-            {/* Auto Sequence Toggle */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={() => setIsAutoSequence(!isAutoSequence)}
-                className={`flex items-center gap-2 px-3.5 py-2 rounded-full text-xs font-semibold transition-all border ${
-                  isAutoSequence
-                    ? 'bg-zinc-900 border-zinc-900 text-white shadow-sm'
-                    : 'bg-stone-100 border-stone-200 text-stone-600 hover:text-zinc-900'
-                }`}
-              >
-                <Play className="w-3.5 h-3.5" />
-                <span>Auto-Burst (1.8s)</span>
-              </button>
-            </div>
-
-            {/* Central Snapshot Shutter Button */}
-            <div>
-              {isComplete ? (
-                <div className="flex items-center gap-2 text-sm font-bold text-emerald-800 bg-emerald-50 px-5 py-2.5 rounded-full border border-emerald-200">
-                  <Check className="w-4 h-4 text-emerald-700" />
-                  <span>All {layout.shotsCount} shots captured!</span>
-                </div>
-              ) : (
-                <button
-                  onClick={startCountdown}
-                  disabled={countdown !== null}
-                  className="group relative flex items-center gap-3 px-8 py-3.5 rounded-full bg-[#18181B] hover:bg-black text-white font-semibold text-sm tracking-wide shadow-capsule hover:shadow-capsule-lg transition-all active:scale-95 disabled:opacity-50 disabled:pointer-events-none"
-                >
-                  <span className="w-2.5 h-2.5 rounded-full bg-[#8B1E27]" />
-                  <Camera className="w-4 h-4 group-hover:scale-110 transition-transform" />
-                  <span>
-                    {countdown !== null ? `Counting down ${countdown}...` : `Take Photo #${currentShotIndex + 1}`}
-                  </span>
-                </button>
-              )}
-            </div>
-
-            {/* Clear all */}
-            <div>
-              {capturedShots.length > 0 && (
-                <button
-                  onClick={() => {
-                    soundManager.playClick();
-                    if (window.confirm('Retake all shots?')) {
-                      onRetakeAll();
-                    }
-                  }}
-                  className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium text-stone-500 hover:text-[#8B1E27] transition-all"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                  <span>Clear shots</span>
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Aesthetic Filter Selector Toolbar */}
-          <div className="w-full mt-5">
-            <div className="flex items-center justify-between mb-2 px-1">
-              <span className="text-xs font-mono font-semibold text-stone-500 tracking-wider uppercase flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-[#8B1E27]" />
-                Editorial Presets
-              </span>
-              <span className="text-[11px] font-mono text-stone-400">Real-time studio tone</span>
-            </div>
-
-            <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
-              {FILTER_OPTIONS.map((filter) => {
-                const isActive = activeFilterId === filter.id;
-                return (
-                  <button
-                    key={filter.id}
-                    onClick={() => {
-                      soundManager.playClick();
-                      setActiveFilterId(filter.id);
-                    }}
-                    className={`relative p-2 rounded-2xl flex flex-col items-center gap-1.5 transition-all text-center border ${
-                      isActive
-                        ? 'bg-white border-zinc-900 shadow-md scale-102'
-                        : 'bg-white/70 hover:bg-white border-stone-200 hover:border-stone-300'
-                    }`}
-                  >
-                    <div
-                      className={`w-full h-10 rounded-xl bg-gradient-to-tr ${filter.previewGradient} border border-stone-200/80 flex items-center justify-center overflow-hidden`}
-                    >
-                      {isActive && <Check className="w-4 h-4 text-zinc-900 drop-shadow-sm" />}
-                    </div>
-                    <span className="text-[11px] font-semibold text-zinc-900 truncate w-full">
-                      {filter.name}
-                    </span>
-                  </button>
-                );
-              })}
+              {/* More dots */}
+              <div className="flex flex-col gap-2">
+                <div className="w-3 h-3 rounded-full bg-zinc-900 border border-zinc-700" />
+                <div className="w-3 h-3 rounded-full bg-zinc-900 border border-zinc-700" />
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Right Sidebar: Scrapbook Gallery Column (Ref 2, 5) */}
-        <div className="lg:col-span-4 w-full">
-          <div className="paper-card p-5 rounded-3xl border border-stone-200 flex flex-col gap-4">
-            <div className="flex items-center justify-between border-b border-stone-200 pb-3">
-              <h3 className="font-bold text-zinc-900 font-serif text-base flex items-center gap-2">
-                <span>Filmstrip Queue</span>
-              </h3>
-              <span className="text-xs text-stone-500 font-mono">
-                {capturedShots.length} of {layout.shotsCount}
-              </span>
-            </div>
-
-            {/* Shots List styled like Polaroid / Scrapbook cards */}
-            <div className="space-y-3 max-h-[460px] overflow-y-auto pr-1">
-              {Array.from({ length: layout.shotsCount }).map((_, idx) => {
-                const shot = capturedShots[idx];
-                const isCurrent = idx === capturedShots.length;
-
-                return (
-                  <div
-                    key={idx}
-                    className={`relative rounded-2xl p-2.5 border transition-all flex items-center gap-3 ${
-                      shot
-                        ? 'bg-white border-stone-200 shadow-sm'
-                        : isCurrent
-                        ? 'bg-[#FAF5EE] border-[#8B1E27]/40 border-dashed animate-pulse'
-                        : 'bg-stone-50 border-stone-200/60 border-dashed'
-                    }`}
-                  >
-                    {/* Thumbnail Slot */}
-                    <div className="w-20 h-16 rounded-xl bg-stone-100 border border-stone-200 overflow-hidden relative shrink-0 flex items-center justify-center">
-                      {shot ? (
-                        <img
-                          src={shot.dataUrl}
-                          alt={`Shot #${idx + 1}`}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-xs font-mono text-stone-400">({idx + 1})</span>
-                      )}
-                    </div>
-
-                    {/* Metadata */}
-                    <div className="flex-1 min-w-0">
-                      <div className="text-xs font-bold text-zinc-900 flex items-center gap-1.5">
-                        <span className="font-mono">({idx + 1})</span>
-                        <span>Shot {idx + 1}</span>
-                        {shot && (
-                          <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-100 text-emerald-800 font-semibold font-mono">
-                            READY
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[11px] text-stone-500 truncate font-sans">
-                        {shot ? 'Captured' : isCurrent ? 'Next in queue...' : 'Waiting...'}
-                      </p>
-                    </div>
-
-                    {/* Delete shot */}
-                    {shot && (
-                      <button
-                        onClick={() => {
-                          soundManager.playClick();
-                          onRemoveShot(shot.id);
-                        }}
-                        className="p-2 rounded-full text-stone-400 hover:text-[#8B1E27] hover:bg-stone-100 transition-colors"
-                        title="Delete and retake"
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Bottom Continue Actions */}
-            <div className="pt-3 border-t border-stone-200 flex flex-col gap-2.5">
-              <Button
-                variant="primary"
-                size="lg"
-                disabled={!isComplete}
-                icon={<ArrowRight className="w-4 h-4" />}
-                iconPosition="right"
-                onClick={onContinue}
-                className="w-full justify-center"
-              >
-                {isComplete ? 'Customize & Curate' : `Take ${layout.shotsCount - capturedShots.length} More Photo${layout.shotsCount - capturedShots.length > 1 ? 's' : ''}`}
-              </Button>
-
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onBack}
-                className="w-full justify-center text-stone-500 hover:text-zinc-900 text-xs"
-              >
-                Change Layout Format
-              </Button>
-            </div>
-          </div>
-        </div>
-
       </div>
+
+      {/* 3-filter pill toggle */}
+      <div className="flex items-center bg-white rounded-full border-2 border-zinc-200 shadow-sm overflow-hidden">
+        {FILTER_PILLS.map((fp) => {
+          const isActive = activeFilterId === fp.id;
+          return (
+            <button
+              key={fp.id}
+              onClick={() => setActiveFilterId(fp.id as FilterId)}
+              className={`px-5 py-2 text-sm font-bold transition-all ${
+                isActive
+                  ? 'bg-[#C8201A] text-white rounded-full mx-1'
+                  : 'text-zinc-500 hover:text-zinc-800'
+              }`}
+            >
+              {fp.icon}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* Shot counter */}
+      <div className="font-dotbooth text-5xl font-bold text-[#C8201A]">
+        {currentShotIndex}/{layout.shotsCount}
+      </div>
+
+      {/* Action row: Upload | Snap | Rotate */}
+      <div className="flex items-center gap-4 w-full justify-center">
+        {/* Upload */}
+        <button
+          onClick={handleUpload}
+          disabled={isComplete}
+          className="flex flex-col items-center gap-0.5 disabled:opacity-40"
+        >
+          <Upload className="w-5 h-5 text-zinc-700" />
+          <span className="text-xs text-zinc-700 font-semibold border-b border-zinc-700">Upload</span>
+        </button>
+
+        {/* Snap */}
+        {isComplete ? (
+          <button
+            onClick={onContinue}
+            className="px-10 py-3.5 rounded-full bg-[#C8201A] text-white font-bold text-base shadow-lg hover:bg-[#A01818] transition-colors"
+          >
+            Next →
+          </button>
+        ) : (
+          <button
+            onClick={startCountdown}
+            disabled={countdown !== null}
+            className="px-10 py-3.5 rounded-full bg-[#FBBDB8] hover:bg-[#f9a09a] text-white font-bold text-base shadow-lg disabled:opacity-60 transition-colors"
+          >
+            {countdown !== null ? `${countdown}...` : 'Snap'}
+          </button>
+        )}
+
+        {/* Retake */}
+        <button
+          onClick={() => { if (window.confirm('Retake all?')) onRetakeAll(); }}
+          className="p-2.5 rounded-full border-2 border-zinc-300 text-zinc-500 hover:border-zinc-500 hover:text-zinc-800 transition-all"
+        >
+          <RefreshCw className="w-4 h-4" />
+        </button>
+      </div>
+
+      {/* Helper text */}
+      <p className="text-xs text-zinc-500 text-center">
+        Each uploaded photo fills one shot.
+      </p>
     </div>
   );
 };

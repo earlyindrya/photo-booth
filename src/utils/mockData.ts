@@ -2,70 +2,59 @@ import { LayoutConfig, FilterConfig, FrameThemeConfig } from '../types/photoboot
 
 export const LAYOUT_OPTIONS: LayoutConfig[] = [
   {
-    id: 'classic-4cut',
-    name: 'Classic 4-Cut Strip',
-    tagline: 'Authentic Korean Photostrip',
+    id: 'polkadot-4cut',
+    name: 'Polka Dot 4-Cut',
+    tagline: 'Gen Z Red Dot Photostrip',
     shotsCount: 4,
     previewRows: 4,
     previewCols: 1,
     aspectRatioLabel: '1:3 Vertical Strip',
-    badge: 'Popular',
-    description: 'The iconic vertical filmstrip format with clean editorial borders, customizable typography, and date stamp.'
+    badge: 'Trending 🔥',
+    description: 'The viral Korean vertical 4-cut photostrip decorated with bold red polka dots, editorial parenthetical numbers (1)-(4), and clean borders.'
   },
   {
-    id: 'zine-moodboard',
-    name: 'Zine Moodboard',
-    tagline: 'Things I Loved (Recap) Style',
+    id: 'zine-recap',
+    name: 'Things I Loved Zine',
+    tagline: 'August!! (recap) Moodboard',
     shotsCount: 3,
     previewRows: 3,
     previewCols: 1,
-    aspectRatioLabel: 'Aesthetic Editorial Strip',
-    badge: 'Editorial Choice',
-    description: 'Artistic asymmetrical layout with numbered badges (1)-(3), polka dot stickers, and editorial typography.'
+    aspectRatioLabel: 'Editorial Zine Format',
+    badge: 'Viral Style',
+    description: '3-cut asymmetrical editorial layout inspired by the trending "Things i loved (recap)" zine poster with red polka dots and volume metadata.'
   },
   {
-    id: 'mac-window-strip',
-    name: 'Y2K Mac OS Window',
-    tagline: 'Desktop Window Collage',
+    id: 'classic-4cut',
+    name: 'Classic Minimal 4-Cut',
+    tagline: 'Clean Monochrome Booth',
     shotsCount: 4,
     previewRows: 4,
     previewCols: 1,
-    aspectRatioLabel: 'Retro Desktop Strip',
-    badge: 'Y2K Retro',
-    description: 'Retro system window chrome with red, yellow, green traffic dots, blue folder icon, and tape label tags.'
+    aspectRatioLabel: '1:3 Filmstrip',
+    badge: 'Clean Minimal',
+    description: 'Understated, modern Korean photostrip with ultra-clean white borders, modern grotesk typography, and date stamp.'
   },
   {
-    id: 'vintage-baroque',
-    name: 'Vintage Baroque Frame',
-    tagline: 'Antique Gilded Museum Edition',
-    shotsCount: 1,
-    previewRows: 1,
-    previewCols: 1,
-    aspectRatioLabel: 'Gilded Museum Portrait',
-    badge: 'Vintage',
-    description: 'Regal ornate golden picture frame with handwritten cursive signature and warm museum archival background.'
-  },
-  {
-    id: 'grid-2x2',
-    name: '2×2 Polaroid Scrapbook',
-    tagline: 'Square Feed & Keepsake',
+    id: 'polaroid-2x2',
+    name: '2×2 Polaroid Square',
+    tagline: 'Balanced 4-Photo Showcase',
     shotsCount: 4,
     previewRows: 2,
     previewCols: 2,
     aspectRatioLabel: '1:1 Square Grid',
     badge: 'Instagram Ready',
-    description: 'Balanced 4-photo grid layout inspired by scrapbook albums and social media highlights.'
+    description: 'Square 4-cut grid layout ideal for social media posts, album keepsakes, and lockscreens.'
   },
   {
-    id: 'cinematic-wide',
-    name: 'Capsule Feature',
-    tagline: 'Airy Wide Hero Portrait',
+    id: 'wide-hero',
+    name: 'Single Hero Cut',
+    tagline: 'Standalone Digicam Portrait',
     shotsCount: 1,
     previewRows: 1,
     previewCols: 1,
-    aspectRatioLabel: '16:9 Editorial Wide',
-    badge: 'Hero Showcase',
-    description: 'High-impact standalone horizontal portrait with clean ticket letterboxing and glassmorphic badge typography.'
+    aspectRatioLabel: '16:10 Wide Feature',
+    badge: 'Solo Hero',
+    description: 'High-impact standalone horizontal portrait with clean editorial captions and date stamp.'
   }
 ];
 
@@ -75,119 +64,112 @@ export const FILTER_OPTIONS: FilterConfig[] = [
     name: 'Natural Light',
     subtitle: 'True studio lighting',
     cssFilter: 'none',
-    previewGradient: 'from-amber-100 to-stone-200'
+    previewGradient: 'from-stone-100 to-stone-200'
   },
   {
-    id: 'april-dream',
-    name: 'April Dream',
-    subtitle: 'Soft diffused warm pastel glow',
-    cssFilter: 'brightness(106%) contrast(92%) saturate(110%) sepia(8%)',
-    previewGradient: 'from-amber-200 via-rose-100 to-sky-100'
+    id: 'soft-glow',
+    name: 'Soft Glow',
+    subtitle: 'Diffused pastel beauty glow',
+    cssFilter: 'brightness(106%) contrast(94%) saturate(108%) sepia(5%)',
+    previewGradient: 'from-rose-100 via-amber-100 to-stone-100'
   },
   {
-    id: 'vintage-ugc',
-    name: 'Vintage UGC',
-    subtitle: 'Warm nostalgic 35mm film tones',
-    cssFilter: 'sepia(30%) contrast(106%) saturate(115%) brightness(102%)',
-    previewGradient: 'from-amber-300 via-orange-200 to-stone-300'
+    id: 'vintage-35mm',
+    name: 'Vintage 35mm',
+    subtitle: 'Warm nostalgic film tones',
+    cssFilter: 'sepia(25%) contrast(108%) saturate(115%) brightness(102%)',
+    previewGradient: 'from-amber-200 via-orange-100 to-stone-300'
   },
   {
-    id: 'noir-editorial',
-    name: 'Noir Editorial',
-    subtitle: 'High contrast magazine monochrome',
-    cssFilter: 'grayscale(100%) contrast(135%) brightness(96%)',
-    previewGradient: 'from-stone-900 via-zinc-600 to-stone-200'
+    id: 'noir-contrast',
+    name: 'Noir Contrast',
+    subtitle: 'Deep punchy B&W magazine tone',
+    cssFilter: 'grayscale(100%) contrast(140%) brightness(96%)',
+    previewGradient: 'from-zinc-900 via-stone-700 to-stone-200'
   },
   {
-    id: 'capsule-sky',
-    name: 'Capsule Sky',
-    subtitle: 'Cool airy blue and clean highlights',
-    cssFilter: 'contrast(105%) brightness(104%) saturate(120%) hue-rotate(190deg)',
-    previewGradient: 'from-sky-300 via-blue-200 to-indigo-100'
+    id: 'cool-digicam',
+    name: 'Y2K Digicam',
+    subtitle: 'Crisp flash highlights & blue tint',
+    cssFilter: 'contrast(115%) brightness(106%) saturate(125%) hue-rotate(185deg)',
+    previewGradient: 'from-sky-200 via-blue-100 to-indigo-100'
   },
   {
-    id: 'retro-90s',
+    id: 'disposable-90s',
     name: 'Disposable 90s',
-    subtitle: 'Punchy flash shadows & golden hue',
-    cssFilter: 'contrast(120%) saturate(130%) sepia(18%) brightness(104%)',
-    previewGradient: 'from-yellow-400 via-amber-300 to-rose-200'
+    subtitle: 'Punchy flash saturation & grain',
+    cssFilter: 'contrast(122%) saturate(135%) sepia(16%) brightness(104%)',
+    previewGradient: 'from-yellow-300 via-amber-200 to-rose-200'
   }
 ];
 
 export const FRAME_THEMES: FrameThemeConfig[] = [
   {
-    id: 'cream-paper',
-    name: 'Warm Linen Paper',
-    bgClass: 'bg-[#FBF9F5]',
-    canvasBg: '#FBF9F5',
-    textColor: '#1F1E1D',
-    subtextColor: '#706B65',
-    borderClass: 'border-[#E8E2D6]',
-    accentBadge: 'Editorial'
-  },
-  {
-    id: 'retro-stripes',
-    name: 'Pastel Awning Stripes',
-    bgClass: 'retro-awning-stripes',
-    canvasBg: '#D7E5F5',
-    textColor: '#6E161E',
-    subtextColor: '#8B1E27',
-    borderClass: 'border-[#BDD3EB]',
-    accentBadge: 'Retro Blue'
-  },
-  {
-    id: 'y2k-mac',
-    name: 'Y2K Desktop Window',
-    bgClass: 'bg-[#E5E5E5]',
-    canvasBg: '#E5E5E5',
-    textColor: '#1A1A1A',
-    subtextColor: '#4A4A4A',
-    borderClass: 'border-[#B0B0B0]',
-    accentBadge: 'Mac OS'
-  },
-  {
-    id: 'zine-cherry',
-    name: 'Cherry Polka Dot Zine',
-    bgClass: 'bg-[#FAF6F0]',
-    canvasBg: '#FAF6F0',
-    textColor: '#1A1A1A',
-    subtextColor: '#8B1E27',
+    id: 'cherry-polkadot',
+    name: 'Cherry Red Dot',
+    bgClass: 'bg-[#FAF8F5]',
+    canvasBg: '#FAF8F5',
+    textColor: '#18181B',
+    subtextColor: '#D92D20',
     borderClass: 'border-zinc-300',
-    accentBadge: 'Polka Dots'
+    dotColor: '#D92D20',
+    accentBadge: 'Trending 🔴'
   },
   {
-    id: 'sky-capsule',
-    name: 'Dreamy Sky Capsule',
-    bgClass: 'bg-gradient-to-b from-[#DCEAFC] via-[#EAF3FD] to-[#F5F9FF]',
-    canvasBg: ['#DCEAFC', '#EAF3FD', '#F5F9FF'],
-    textColor: '#1E3A8A',
-    subtextColor: '#3B82F6',
-    borderClass: 'border-blue-200',
-    accentBadge: 'Capsule'
+    id: 'noir-polkadot',
+    name: 'Noir Black Dot',
+    bgClass: 'bg-white',
+    canvasBg: '#FFFFFF',
+    textColor: '#18181B',
+    subtextColor: '#71717A',
+    borderClass: 'border-zinc-900',
+    dotColor: '#18181B',
+    accentBadge: 'Monochrome ⚫'
   },
   {
-    id: 'baroque-gold',
-    name: 'Antique Baroque Gold',
-    bgClass: 'bg-[#F9F5EC]',
-    canvasBg: '#F9F5EC',
-    textColor: '#541016',
-    subtextColor: '#8F7135',
-    borderClass: 'border-[#C5A059]',
-    accentBadge: 'Museum'
+    id: 'blush-polkadot',
+    name: 'Blush Pink Dot',
+    bgClass: 'bg-[#FFF0F2]',
+    canvasBg: '#FFF0F2',
+    textColor: '#881337',
+    subtextColor: '#D92D20',
+    borderClass: 'border-rose-200',
+    dotColor: '#D92D20',
+    accentBadge: 'Cute Pink 🎀'
   },
   {
-    id: 'studio-noir',
-    name: 'Minimalist Noir',
-    bgClass: 'bg-[#1C1C1F]',
-    canvasBg: '#1C1C1F',
+    id: 'minimal-white',
+    name: 'Studio White',
+    bgClass: 'bg-[#FFFFFF]',
+    canvasBg: '#FFFFFF',
+    textColor: '#18181B',
+    subtextColor: '#71717A',
+    borderClass: 'border-zinc-200',
+    accentBadge: 'Minimal ⚪'
+  },
+  {
+    id: 'linen-paper',
+    name: 'Warm Linen Paper',
+    bgClass: 'bg-[#F5EFE6]',
+    canvasBg: '#F5EFE6',
+    textColor: '#1C1917',
+    subtextColor: '#78716C',
+    borderClass: 'border-[#E5DDD2]',
+    accentBadge: 'Vintage 📜'
+  },
+  {
+    id: 'obsidian-noir',
+    name: 'Obsidian Dark',
+    bgClass: 'bg-[#18181B]',
+    canvasBg: '#18181B',
     textColor: '#FFFFFF',
     subtextColor: '#A1A1AA',
-    borderClass: 'border-white/10',
-    accentBadge: 'Dark'
+    borderClass: 'border-zinc-800',
+    accentBadge: 'Dark Studio 🖤'
   }
 ];
 
-// Helper to generate aesthetic editorial mock portraits if camera is inactive
+// Helper to generate simulated mock portraits if webcam is disabled
 export function generateMockPortrait(shotIndex: number): string {
   if (typeof document === 'undefined') return '';
   const canvas = document.createElement('canvas');
@@ -196,65 +178,69 @@ export function generateMockPortrait(shotIndex: number): string {
   const ctx = canvas.getContext('2d');
   if (!ctx) return '';
 
-  // Warm editorial palettes inspired by the reference images
-  const palettes = [
-    { bg: ['#F3ECE2', '#E2D4C3'], accent: '#8B1E27', tag: 'APRIL RECAP' },
-    { bg: ['#DCE8F6', '#C7D9EF'], accent: '#1E3A8A', tag: 'CAPSULE MOMENT' },
-    { bg: ['#EFE7DD', '#DFD3C3'], accent: '#541016', tag: 'EDITORIAL VOGUE' },
-    { bg: ['#ECE7DF', '#D9CFC4'], accent: '#1F1E1D', tag: 'THINGS I LOVED' }
+  const mockPalettes = [
+    { bg: ['#F7F3EE', '#E9E2D8'], accent: '#D92D20', label: 'THINGS I LOVED (1)' },
+    { bg: ['#FFF0F2', '#FDE2E6'], accent: '#D92D20', label: 'AUGUST!! (2)' },
+    { bg: ['#F2F2F2', '#E2E2E2'], accent: '#18181B', label: 'MY PICKS (3)' },
+    { bg: ['#FAF6F0', '#EFE7DC'], accent: '#D92D20', label: 'FAVORITE FINDS (4)' }
   ];
 
-  const palette = palettes[shotIndex % palettes.length];
+  const p = mockPalettes[shotIndex % mockPalettes.length];
   const grad = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
-  grad.addColorStop(0, palette.bg[0]);
-  grad.addColorStop(1, palette.bg[1]);
+  grad.addColorStop(0, p.bg[0]);
+  grad.addColorStop(1, p.bg[1]);
   ctx.fillStyle = grad;
   ctx.fillRect(0, 0, canvas.width, canvas.height);
 
   ctx.save();
-  // Aesthetic background arch / circle
+  // Aesthetic background circle
   ctx.beginPath();
-  ctx.arc(canvas.width / 2, canvas.height * 0.42, 130, 0, Math.PI * 2);
-  ctx.fillStyle = 'rgba(255, 255, 255, 0.45)';
+  ctx.arc(canvas.width / 2, canvas.height * 0.45, 130, 0, Math.PI * 2);
+  ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
   ctx.fill();
 
-  // Head and shoulders portrait silhouette
+  // Head and silhouette
   ctx.beginPath();
   ctx.arc(canvas.width / 2, 210, 68, 0, Math.PI * 2);
-  ctx.fillStyle = '#262422';
+  ctx.fillStyle = '#222222';
   ctx.fill();
 
   ctx.beginPath();
   ctx.ellipse(canvas.width / 2, 385, 140, 110, 0, 0, Math.PI * 2);
-  ctx.fillStyle = '#262422';
+  ctx.fillStyle = '#222222';
   ctx.fill();
 
-  // Chic sunnies/glasses representation
+  // Oval sunglasses (from the user's reference image!)
   ctx.fillStyle = '#111111';
-  ctx.roundRect(canvas.width / 2 - 38, 195, 32, 18, 6);
-  ctx.roundRect(canvas.width / 2 + 6, 195, 32, 18, 6);
+  ctx.beginPath();
+  ctx.ellipse(canvas.width / 2 - 25, 205, 22, 12, 0, 0, Math.PI * 2);
+  ctx.ellipse(canvas.width / 2 + 25, 205, 22, 12, 0, 0, Math.PI * 2);
   ctx.fill();
 
-  // Aesthetic sticker tag pill on portrait
+  // Red Polka Dot Accent Sticker (Gen Z trend!)
+  ctx.fillStyle = '#D92D20';
+  ctx.beginPath();
+  ctx.arc(canvas.width / 2 + 95, 155, 18, 0, Math.PI * 2);
+  ctx.fill();
+
+  // Bottom Label Badge
   ctx.fillStyle = '#FFFFFF';
   ctx.shadowColor = 'rgba(0,0,0,0.08)';
   ctx.shadowBlur = 8;
   ctx.shadowOffsetY = 3;
-  ctx.roundRect(canvas.width / 2 - 110, 440, 220, 42, 21);
+  ctx.roundRect(canvas.width / 2 - 120, 440, 240, 42, 21);
   ctx.fill();
 
   ctx.shadowColor = 'transparent';
-  ctx.fillStyle = palette.accent;
-  ctx.font = 'bold 15px "Plus Jakarta Sans", sans-serif';
+  ctx.fillStyle = p.accent;
+  ctx.font = 'bold 15px "Space Grotesk", sans-serif';
   ctx.textAlign = 'center';
-  ctx.letterSpacing = '1px';
-  ctx.fillText(`• ${palette.tag} •`, canvas.width / 2, 467);
+  ctx.fillText(p.label, canvas.width / 2, 467);
 
-  // Top editorial note
-  const poses = ['spring walks ☕', 'delicious meals 🥐', 'travel moments ✈️', 'favorite finds 🤍'];
-  ctx.font = 'italic 20px "Playfair Display", serif';
-  ctx.fillStyle = '#1F1E1D';
-  ctx.fillText(poses[shotIndex % poses.length], canvas.width / 2, 85);
+  // Top parenthetical badge
+  ctx.font = 'bold 22px "Plus Jakarta Sans", sans-serif';
+  ctx.fillStyle = '#18181B';
+  ctx.fillText(`(${shotIndex + 1})`, canvas.width / 2, 85);
 
   ctx.restore();
 
@@ -262,8 +248,7 @@ export function generateMockPortrait(shotIndex: number): string {
 }
 
 export const STICKER_PALETTE = [
-  '🔴', '⚪', '🍒', '🎀', '☕', '🕶️',
-  '📸', '🤍', '🥐', '🪞', '🍎', '🕊️',
-  '💌', '🎞️', '✈️', '💐', '📖', '🚲',
-  '📁', '📎', '🏷️', '⭐', '✦', '✨'
+  '🔴', '⚫', '⚪', '🍒', '🎀', '🕶️',
+  '💄', '📸', '🤍', '❤️', '☕', '✨',
+  '⭐', '🧸', '💌', '🎧', '🥐', '🕊️'
 ];

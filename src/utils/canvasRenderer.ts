@@ -20,8 +20,8 @@ function drawImageCover(
   width: number,
   height: number,
   borderRadius = 16,
-  strokeColor = 'rgba(0, 0, 0, 0.08)',
-  strokeWidth = 2
+  strokeColor = '#18181B',
+  strokeWidth = 3
 ) {
   ctx.save();
 
@@ -48,7 +48,7 @@ function drawImageCover(
 
   ctx.drawImage(img, x + offsetX, y + offsetY, renderW, renderH);
 
-  // Inner border
+  // Border outline
   if (strokeColor && strokeWidth > 0) {
     ctx.strokeStyle = strokeColor;
     ctx.lineWidth = strokeWidth;
@@ -58,96 +58,19 @@ function drawImageCover(
   ctx.restore();
 }
 
-// Helper to draw striped awning background (Ref 3)
-function drawAwningStripes(ctx: CanvasRenderingContext2D, width: number, height: number) {
-  const stripeW = 44;
-  const color1 = '#D7E5F5';
-  const color2 = '#FFFDF9';
-
-  ctx.fillStyle = color2;
-  ctx.fillRect(0, 0, width, height);
-
-  ctx.fillStyle = color1;
-  for (let x = 0; x < width; x += stripeW * 2) {
-    ctx.fillRect(x, 0, stripeW, height);
-  }
-}
-
-// Helper to draw ornate Baroque gilded border (Ref 3)
-function drawBaroqueFrame(ctx: CanvasRenderingContext2D, width: number, height: number) {
+// Helper to draw a crisp vector polka dot
+function drawPolkaDot(
+  ctx: CanvasRenderingContext2D,
+  cx: number,
+  cy: number,
+  radius: number,
+  color = '#D92D20'
+) {
   ctx.save();
-  // Outer antique gold line
-  ctx.strokeStyle = '#8F7135';
-  ctx.lineWidth = 14;
-  ctx.strokeRect(30, 30, width - 60, height - 60);
-
-  // Inner gilded line
-  ctx.strokeStyle = '#C5A059';
-  ctx.lineWidth = 6;
-  ctx.strokeRect(50, 50, width - 100, height - 100);
-
-  // Corner decorative squares
-  const corners = [
-    [30, 30],
-    [width - 58, 30],
-    [30, height - 58],
-    [width - 58, height - 58],
-  ];
-  ctx.fillStyle = '#8F7135';
-  corners.forEach(([cx, cy]) => {
-    ctx.fillRect(cx - 4, cy - 4, 36, 36);
-  });
-  ctx.fillStyle = '#C5A059';
-  corners.forEach(([cx, cy]) => {
-    ctx.fillRect(cx + 2, cy + 2, 24, 24);
-  });
-
-  ctx.restore();
-}
-
-// Helper to draw Mac OS Window Chrome at top (Ref 4)
-function drawMacWindowChrome(ctx: CanvasRenderingContext2D, width: number, barHeight: number) {
-  ctx.save();
-  // Chrome bar gradient
-  const grad = ctx.createLinearGradient(0, 0, 0, barHeight);
-  grad.addColorStop(0, '#ECECEC');
-  grad.addColorStop(1, '#D4D4D4');
-  ctx.fillStyle = grad;
-  ctx.fillRect(0, 0, width, barHeight);
-
-  // Bottom border line
-  ctx.strokeStyle = '#B5B5B5';
-  ctx.lineWidth = 3;
+  ctx.fillStyle = color;
   ctx.beginPath();
-  ctx.moveTo(0, barHeight);
-  ctx.lineTo(width, barHeight);
-  ctx.stroke();
-
-  // Traffic lights
-  const dotY = barHeight / 2;
-  const radius = 18;
-  const dots = [
-    { x: 50, color: '#FF5F56', stroke: '#E0443E' },
-    { x: 96, color: '#FFBD2E', stroke: '#DEA123' },
-    { x: 142, color: '#27C93F', stroke: '#1AAB29' },
-  ];
-
-  dots.forEach(({ x, color, stroke }) => {
-    ctx.beginPath();
-    ctx.arc(x, dotY, radius, 0, Math.PI * 2);
-    ctx.fillStyle = color;
-    ctx.fill();
-    ctx.strokeStyle = stroke;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-  });
-
-  // Window title text
-  ctx.fillStyle = '#333333';
-  ctx.font = 'bold 32px "Space Mono", monospace';
-  ctx.textAlign = 'center';
-  ctx.fillText('capsule_atelier.raw', width / 2, dotY + 11);
-
+  ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+  ctx.fill();
   ctx.restore();
 }
 
@@ -173,28 +96,26 @@ export async function renderPhotoStripCanvas(
     })
   );
 
-  // Determine canvas dimensions based on layout
+  // High-res canvas dimensions
   let width = 1200;
   let height = 3600;
 
-  if (layout.id === 'zine-moodboard') {
-    width = 1300;
+  if (layout.id === 'zine-recap') {
+    width = 1400;
     height = 3200;
-  } else if (layout.id === 'grid-2x2') {
+  } else if (layout.id === 'polaroid-2x2') {
     width = 2000;
     height = 2400;
-  } else if (layout.id === 'cinematic-wide' || layout.id === 'vintage-baroque') {
+  } else if (layout.id === 'wide-hero') {
     width = 2200;
-    height = 1600;
+    height = 1500;
   }
 
   canvas.width = width;
   canvas.height = height;
 
-  // 1. Draw Background
-  if (theme.id === 'retro-stripes') {
-    drawAwningStripes(ctx, width, height);
-  } else if (Array.isArray(theme.canvasBg)) {
+  // 1. Draw Canvas Background
+  if (Array.isArray(theme.canvasBg)) {
     const grad = ctx.createLinearGradient(0, 0, width, height);
     theme.canvasBg.forEach((color, index) => {
       grad.addColorStop(index / (theme.canvasBg.length - 1), color);
@@ -206,31 +127,33 @@ export async function renderPhotoStripCanvas(
     ctx.fillRect(0, 0, width, height);
   }
 
-  // Draw Baroque Frame if theme is Baroque
-  if (theme.id === 'baroque-gold' || layout.id === 'vintage-baroque') {
-    drawBaroqueFrame(ctx, width, height);
+  // 2. Draw Ambient Red Polka Dots along the frame if enabled (Gen Z Trend from reference image)
+  if (settings.showPolkaDots) {
+    const dotCol = theme.dotColor || '#D92D20';
+    // Border edge anchor dots
+    drawPolkaDot(ctx, 70, 80, 24, dotCol);
+    drawPolkaDot(ctx, width - 70, 90, 28, dotCol);
+    drawPolkaDot(ctx, 50, height * 0.32, 22, dotCol);
+    drawPolkaDot(ctx, width - 60, height * 0.48, 26, dotCol);
+    drawPolkaDot(ctx, 65, height * 0.72, 24, dotCol);
+    drawPolkaDot(ctx, width - 75, height * 0.85, 28, dotCol);
+    drawPolkaDot(ctx, 120, height - 120, 22, dotCol);
+    drawPolkaDot(ctx, width - 110, height - 100, 26, dotCol);
   }
 
-  // Draw Mac OS Chrome bar if theme or layout is Y2K (Ref 4)
-  const isMacTheme = theme.id === 'y2k-mac' || layout.id === 'mac-window-strip';
-  const macBarHeight = isMacTheme ? 100 : 0;
-  if (isMacTheme) {
-    drawMacWindowChrome(ctx, width, macBarHeight);
-  }
-
-  // Resolve font family string for canvas rendering
+  // Resolve font style
   const fontFam = {
+    grotesk: '"Space Grotesk", sans-serif',
     serif: '"Playfair Display", Georgia, serif',
-    sans: '"Plus Jakarta Sans", sans-serif',
     script: '"Caveat", cursive',
     mono: '"Space Mono", monospace',
-  }[settings.fontStyle || 'serif'];
+  }[settings.fontStyle || 'grotesk'];
 
-  // 2. Layout-specific photo placements
-  if (layout.id === 'classic-4cut' || layout.id === 'mac-window-strip') {
-    const marginX = 90;
-    const topMargin = macBarHeight + 90;
-    const bottomSpace = 380;
+  // 3. Layout Rendering
+  if (layout.id === 'polkadot-4cut' || layout.id === 'classic-4cut') {
+    const marginX = 100;
+    const topMargin = 110;
+    const bottomSpace = 400;
     const availableHeight = height - topMargin - bottomSpace;
     const gap = 44;
     const photoWidth = width - marginX * 2;
@@ -249,79 +172,78 @@ export async function renderPhotoStripCanvas(
           photoWidth, 
           photoHeight, 
           settings.frameBorderRadius * 1.5,
-          theme.id === 'cream-paper' ? 'rgba(0, 0, 0, 0.15)' : 'rgba(0, 0, 0, 0.08)'
+          '#18181B',
+          4
         );
       } else {
-        ctx.fillStyle = '#EBE4D8';
+        ctx.fillStyle = '#EBE7E0';
         ctx.roundRect(marginX, photoY, photoWidth, photoHeight, settings.frameBorderRadius * 1.5);
         ctx.fill();
       }
 
-      // Small photo number badge in corner (Ref 5)
+      // Corner Parenthetical Badge (1), (2), (3), (4)
       ctx.save();
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-      ctx.roundRect(marginX + 20, photoY + 20, 60, 36, 10);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+      ctx.roundRect(marginX + 20, photoY + 20, 64, 38, 10);
       ctx.fill();
-      ctx.fillStyle = '#1A1A1A';
-      ctx.font = 'bold 22px "Space Mono", monospace';
+      ctx.strokeStyle = '#18181B';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      ctx.fillStyle = '#18181B';
+      ctx.font = 'bold 24px "Space Grotesk", sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(`(${i + 1})`, marginX + 50, photoY + 45);
+      ctx.fillText(`(${i + 1})`, marginX + 52, photoY + 47);
       ctx.restore();
     }
 
-    // Bottom Typography Area (Ref 2, 5)
+    // Bottom Wordmark & Metadata Area (Ref: Things i loved August!! (recap))
     const footerCenterY = height - bottomSpace / 2;
     ctx.save();
     ctx.fillStyle = theme.textColor;
-    ctx.font = `bold 52px ${fontFam}`;
+    ctx.font = `bold 54px ${fontFam}`;
     ctx.textAlign = 'center';
-    ctx.fillText(settings.title || 'capsule photobooth', width / 2, footerCenterY - 45);
+    ctx.fillText(settings.title || 'Things i loved', width / 2, footerCenterY - 45);
 
-    ctx.fillStyle = theme.subtextColor;
-    ctx.font = '500 32px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText(settings.subtitle || 'monthly recap • studio moments', width / 2, footerCenterY + 12);
+    ctx.fillStyle = '#D92D20';
+    ctx.font = 'bold 44px "Space Grotesk", sans-serif';
+    ctx.fillText(settings.subtitle || 'August!! (recap)', width / 2, footerCenterY + 12);
 
     if (settings.showDateStamp) {
-      const now = new Date();
-      const dateStr = now.toLocaleDateString('en-US', {
-        month: 'short',
-        day: '2-digit',
-        year: 'numeric'
-      }).toUpperCase();
       ctx.font = 'bold 24px "Space Mono", monospace';
-      ctx.fillStyle = theme.textColor;
-      ctx.fillText(`• ${dateStr} • VOL.08 (RECAP)`, width / 2, footerCenterY + 68);
+      ctx.fillStyle = theme.subtextColor;
+      ctx.fillText(settings.editionText || 'edition 08.26 • vol.08', width / 2, footerCenterY + 70);
     }
-
-    // Handwritten cursive sign-off (Ref 2 "smm goza")
-    if (settings.fontStyle === 'script') {
-      ctx.font = 'italic 48px "Caveat", cursive';
-      ctx.fillStyle = theme.textColor;
-      ctx.fillText('smm goza • atelier', width / 2, footerCenterY + 130);
-    }
-
     ctx.restore();
 
-  } else if (layout.id === 'zine-moodboard') {
-    // 3 Photos Asymmetric Zine Layout with Polka Dots (Ref 5)
-    const marginX = 110;
-    const topMargin = 220;
-    const bottomSpace = 360;
+  } else if (layout.id === 'zine-recap') {
+    // 3-Cut Asymmetric Zine Poster Style (Directly matching user's uploaded poster)
+    const marginX = 130;
+    const topMargin = 260;
+    const bottomSpace = 440;
     const gap = 52;
     const photoWidth = width - marginX * 2;
     const photoHeight = (height - topMargin - bottomSpace - gap * 2) / 3;
 
-    // Zine Top Header (Ref 5: Things I loved this month)
+    // Poster Header
     ctx.save();
-    ctx.fillStyle = '#8B1E27';
-    ctx.font = 'italic bold 56px "Playfair Display", Georgia, serif';
+    ctx.fillStyle = '#18181B';
+    ctx.font = 'bold 64px "Space Grotesk", sans-serif';
     ctx.textAlign = 'left';
-    ctx.fillText('Things i loved.', marginX, 120);
+    ctx.fillText('Things', marginX, 140);
 
-    ctx.fillStyle = '#706B65';
-    ctx.font = 'bold 28px "Space Mono", monospace';
+    ctx.font = 'bold 32px "Space Mono", monospace';
+    ctx.fillStyle = '#71717A';
+    ctx.fillText('(8)', marginX, 85);
+
+    ctx.font = 'bold 64px "Space Grotesk", sans-serif';
     ctx.textAlign = 'right';
-    ctx.fillText('edition 08.26 / vol.08', width - marginX, 120);
+    ctx.fillStyle = '#18181B';
+    ctx.fillText('i', width - marginX, 140);
+
+    ctx.font = 'bold 32px "Space Mono", monospace';
+    ctx.fillStyle = '#71717A';
+    ctx.fillText('(2)', width - marginX, 85);
     ctx.restore();
 
     for (let i = 0; i < 3; i++) {
@@ -337,44 +259,49 @@ export async function renderPhotoStripCanvas(
           photoWidth, 
           photoHeight, 
           settings.frameBorderRadius * 1.5,
-          '#1A1A1A',
-          4
+          '#18181B',
+          5
         );
       } else {
-        ctx.fillStyle = '#EAE4D9';
+        ctx.fillStyle = '#EBE7E0';
         ctx.roundRect(marginX, photoY, photoWidth, photoHeight, settings.frameBorderRadius * 1.5);
         ctx.fill();
       }
 
-      // Editorial number label (Ref 5: (1), (2), (3))
+      // Editorial number label
       ctx.save();
       ctx.fillStyle = '#D92D20';
-      ctx.beginPath();
-      ctx.arc(marginX - 30, photoY + 50, 20, 0, Math.PI * 2);
+      ctx.roundRect(marginX + 24, photoY + photoHeight - 56, 70, 40, 10);
       ctx.fill();
-      ctx.fillStyle = '#1A1A1A';
-      ctx.font = 'bold 34px "Plus Jakarta Sans", sans-serif';
-      ctx.textAlign = 'left';
-      ctx.fillText(`(${i + 1})`, marginX + 30, photoY + photoHeight - 30);
+      ctx.fillStyle = '#FFFFFF';
+      ctx.font = 'bold 24px "Space Grotesk", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`(${i + 1})`, marginX + 59, photoY + photoHeight - 28);
       ctx.restore();
     }
 
-    // Zine Footer
+    // Poster Footer Area
     const footerY = height - bottomSpace / 2;
     ctx.save();
-    ctx.fillStyle = '#1A1A1A';
-    ctx.font = `bold 54px ${fontFam}`;
-    ctx.textAlign = 'center';
-    ctx.fillText(settings.title || 'August!! (recap)', width / 2, footerY - 20);
+    ctx.fillStyle = '#18181B';
+    ctx.font = 'bold 68px "Space Grotesk", sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText(settings.title || 'August!!', marginX, footerY - 20);
 
-    ctx.font = 'italic 34px "Playfair Display", serif';
-    ctx.fillStyle = '#8B1E27';
-    ctx.fillText(settings.subtitle || 'favorite finds & moments', width / 2, footerY + 35);
+    ctx.font = 'bold 30px "Space Mono", monospace';
+    ctx.fillStyle = '#71717A';
+    ctx.fillText(settings.editionText || 'edition 08.26 • vol.08', marginX, footerY + 30);
+    ctx.fillText('my picks • favorite finds', marginX, footerY + 68);
+
+    ctx.font = 'bold 64px "Space Grotesk", sans-serif';
+    ctx.textAlign = 'right';
+    ctx.fillStyle = '#D92D20';
+    ctx.fillText('(recap)', width - marginX, footerY + 20);
     ctx.restore();
 
-  } else if (layout.id === 'grid-2x2') {
+  } else if (layout.id === 'polaroid-2x2') {
     const margin = 120;
-    const topMargin = macBarHeight + 120;
+    const topMargin = 120;
     const footerHeight = 360;
     const gap = 52;
     const photoWidth = (width - margin * 2 - gap) / 2;
@@ -388,94 +315,75 @@ export async function renderPhotoStripCanvas(
       const img = loadedImages[i];
 
       if (img) {
-        drawImageCover(ctx, img, x, y, photoWidth, photoHeight, settings.frameBorderRadius * 1.5);
+        drawImageCover(ctx, img, x, y, photoWidth, photoHeight, settings.frameBorderRadius * 1.5, '#18181B', 4);
       } else {
-        ctx.fillStyle = '#EAE4D9';
+        ctx.fillStyle = '#EBE7E0';
         ctx.roundRect(x, y, photoWidth, photoHeight, settings.frameBorderRadius * 1.5);
         ctx.fill();
       }
 
-      // Small corner badge
+      // Corner badge
       ctx.save();
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.9)';
-      ctx.roundRect(x + 18, y + 18, 54, 32, 8);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.95)';
+      ctx.roundRect(x + 20, y + 20, 60, 36, 8);
       ctx.fill();
-      ctx.fillStyle = '#1F1E1D';
-      ctx.font = 'bold 20px "Space Mono", monospace';
+      ctx.fillStyle = '#18181B';
+      ctx.font = 'bold 22px "Space Grotesk", sans-serif';
       ctx.textAlign = 'center';
-      ctx.fillText(`(${i + 1})`, x + 45, y + 41);
+      ctx.fillText(`(${i + 1})`, x + 50, y + 46);
       ctx.restore();
     }
 
-    // Footer
     const footerY = height - footerHeight / 2;
     ctx.save();
     ctx.fillStyle = theme.textColor;
     ctx.font = `bold 56px ${fontFam}`;
     ctx.textAlign = 'center';
-    ctx.fillText(settings.title || 'capsule photobooth', width / 2, footerY - 30);
+    ctx.fillText(settings.title || 'Things i loved', width / 2, footerY - 30);
 
-    ctx.fillStyle = theme.subtextColor;
-    ctx.font = '500 32px "Plus Jakarta Sans", sans-serif';
-    ctx.fillText(settings.subtitle || 'MEMORIES IN 2x2', width / 2, footerY + 25);
+    ctx.fillStyle = '#D92D20';
+    ctx.font = 'bold 36px "Space Grotesk", sans-serif';
+    ctx.fillText(settings.subtitle || 'August!! (recap)', width / 2, footerY + 25);
 
     if (settings.showDateStamp) {
-      const now = new Date();
-      const dateStr = now.toLocaleDateString('en-US', {
-        month: 'short',
-        day: '2-digit',
-        year: 'numeric'
-      }).toUpperCase();
       ctx.font = 'bold 26px "Space Mono", monospace';
-      ctx.fillStyle = theme.textColor;
-      ctx.fillText(`★ ${dateStr} ★`, width / 2, footerY + 75);
+      ctx.fillStyle = theme.subtextColor;
+      ctx.fillText(settings.editionText || 'edition 08.26 • vol.08', width / 2, footerY + 75);
     }
     ctx.restore();
 
   } else {
-    // Cinematic Wide or Vintage Baroque Portrait
+    // Single Hero Cut
     const marginX = 160;
-    const marginY = macBarHeight + 140;
+    const marginY = 140;
     const footerHeight = 240;
     const photoWidth = width - marginX * 2;
     const photoHeight = height - marginY - footerHeight;
 
     const img = loadedImages[0];
     if (img) {
-      drawImageCover(
-        ctx, 
-        img, 
-        marginX, 
-        marginY, 
-        photoWidth, 
-        photoHeight, 
-        settings.frameBorderRadius * 1.5,
-        theme.id === 'baroque-gold' ? '#8F7135' : 'rgba(0, 0, 0, 0.1)',
-        theme.id === 'baroque-gold' ? 6 : 2
-      );
+      drawImageCover(ctx, img, marginX, marginY, photoWidth, photoHeight, settings.frameBorderRadius * 1.5, '#18181B', 5);
     }
 
-    // Letterbox Footer
     const footerY = height - footerHeight / 2;
     ctx.save();
     ctx.fillStyle = theme.textColor;
-    ctx.font = `bold 50px ${fontFam}`;
+    ctx.font = `bold 54px ${fontFam}`;
     ctx.textAlign = 'left';
-    ctx.fillText(settings.title || 'Curious by Heart.', marginX + 30, footerY);
+    ctx.fillText(settings.title || 'Things i loved.', marginX + 30, footerY);
 
-    ctx.fillStyle = theme.subtextColor;
-    ctx.font = 'italic 32px "Playfair Display", serif';
-    ctx.fillText(settings.subtitle || 'Capsule Atelier Exhibition 2026', marginX + 30, footerY + 50);
+    ctx.fillStyle = '#D92D20';
+    ctx.font = 'bold 34px "Space Grotesk", sans-serif';
+    ctx.fillText(settings.subtitle || 'August!! (recap)', marginX + 30, footerY + 50);
 
-    // Cursive sign-off (Ref 2 "smm goza")
-    ctx.font = 'italic 48px "Caveat", cursive';
+    ctx.font = 'bold 30px "Space Mono", monospace';
     ctx.textAlign = 'right';
-    ctx.fillStyle = theme.textColor;
-    ctx.fillText('smm goza • atelier', width - marginX - 30, footerY + 30);
+    ctx.fillStyle = theme.subtextColor;
+    ctx.fillText(settings.editionText || 'edition 08.26 • vol.08', width - marginX - 30, footerY + 30);
     ctx.restore();
   }
 
-  // 3. Render Stickers
+  // 4. Render Stickers with high-res anti-aliased drawing
   if (settings.stickers && settings.stickers.length > 0) {
     ctx.save();
     ctx.textAlign = 'center';
@@ -486,26 +394,15 @@ export async function renderPhotoStripCanvas(
       const posY = (sticker.y / 100) * height;
 
       if (sticker.emoji === '🔴') {
-        // High-res vector red polka dot (Ref 5)
-        ctx.fillStyle = '#D92D20';
-        ctx.shadowColor = 'rgba(217, 45, 32, 0.35)';
-        ctx.shadowBlur = 10;
-        ctx.beginPath();
-        ctx.arc(posX, posY, sticker.size * 1.2, 0, Math.PI * 2);
-        ctx.fill();
+        drawPolkaDot(ctx, posX, posY, sticker.size * 1.25, '#D92D20');
+      } else if (sticker.emoji === '⚫') {
+        drawPolkaDot(ctx, posX, posY, sticker.size * 1.25, '#18181B');
       } else if (sticker.emoji === '⚪') {
-        // High-res vector white circle dot (Ref 2)
-        ctx.fillStyle = '#FFFFFF';
+        drawPolkaDot(ctx, posX, posY, sticker.size * 1.25, '#FFFFFF');
+      } else {
+        const fontSize = sticker.size * 2.2;
         ctx.shadowColor = 'rgba(0, 0, 0, 0.2)';
         ctx.shadowBlur = 12;
-        ctx.beginPath();
-        ctx.arc(posX, posY, sticker.size * 1.3, 0, Math.PI * 2);
-        ctx.fill();
-      } else {
-        // Emoji sticker
-        const fontSize = sticker.size * 2.2;
-        ctx.shadowColor = 'rgba(0, 0, 0, 0.25)';
-        ctx.shadowBlur = 14;
         ctx.shadowOffsetX = 3;
         ctx.shadowOffsetY = 3;
         ctx.font = `${fontSize}px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif`;

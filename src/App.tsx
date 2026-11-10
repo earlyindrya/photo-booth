@@ -9,17 +9,15 @@ import { CustomizeScreen } from './components/screens/CustomizeScreen';
 import { DownloadScreen } from './components/screens/DownloadScreen';
 
 const DEFAULT_SETTINGS: CustomizationSettings = {
-  theme: 'cream-paper',
-  fontStyle: 'serif',
-  title: 'things i loved',
-  subtitle: '(monthly recap)',
+  theme: 'cherry-polkadot',
+  fontStyle: 'grotesk',
+  title: 'Things i loved today',
+  subtitle: 'dot booth',
+  editionText: '10.11.26 edition',
   showDateStamp: true,
-  showWatermark: true,
+  showPolkaDots: true,
   frameBorderRadius: 10,
-  stickers: [
-    { id: 'default-1', emoji: '🔴', x: 86, y: 10, size: 22 },
-    { id: 'default-2', emoji: '☕', x: 12, y: 92, size: 26 },
-  ],
+  stickers: [],
 };
 
 export const App: React.FC = () => {
@@ -28,20 +26,11 @@ export const App: React.FC = () => {
   const [capturedShots, setCapturedShots] = useState<CapturedShot[]>([]);
   const [customizationSettings, setCustomizationSettings] = useState<CustomizationSettings>(DEFAULT_SETTINGS);
 
-  // Workflow Handlers
-  const handleStart = () => {
-    setCurrentStep('layout');
-  };
-
   const handleSelectLayout = (layout: LayoutConfig) => {
     if (layout.id !== selectedLayout.id) {
       setSelectedLayout(layout);
-      setCapturedShots([]); // Reset shots if layout format changes
+      setCapturedShots([]);
     }
-  };
-
-  const handleContinueToCamera = () => {
-    setCurrentStep('camera');
   };
 
   const handleAddShot = (shot: CapturedShot) => {
@@ -52,21 +41,7 @@ export const App: React.FC = () => {
     setCapturedShots((prev) => prev.filter((s) => s.id !== id));
   };
 
-  const handleRetakeAll = () => {
-    setCapturedShots([]);
-  };
-
-  const handleContinueToCustomize = () => {
-    setCurrentStep('customize');
-  };
-
-  const handleContinueToDownload = () => {
-    setCurrentStep('download');
-  };
-
-  const handleBackToEdit = () => {
-    setCurrentStep('customize');
-  };
+  const handleRetakeAll = () => { setCapturedShots([]); };
 
   const handleReset = () => {
     setCurrentStep('start');
@@ -75,29 +50,36 @@ export const App: React.FC = () => {
     setCustomizationSettings(DEFAULT_SETTINGS);
   };
 
+  const getBackHandler = () => {
+    switch (currentStep) {
+      case 'layout': return () => setCurrentStep('start');
+      case 'camera': return () => setCurrentStep('layout');
+      case 'customize': return () => setCurrentStep('camera');
+      case 'download': return () => setCurrentStep('customize');
+      default: return undefined;
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-[#FAF7F2] text-zinc-900 flex flex-col font-sans selection:bg-[#8B1E27] selection:text-white">
-      {/* Top Navigation */}
+    <div className="min-h-screen bg-[#F5EFE7] text-zinc-950 flex flex-col">
       <Navbar
         currentStep={currentStep}
         onReset={handleReset}
+        onBack={getBackHandler()}
       />
 
-      {/* Main Step Viewport */}
       <main className="flex-1 w-full">
         {currentStep === 'start' && (
-          <StartScreen onStart={handleStart} />
+          <StartScreen onStart={() => setCurrentStep('layout')} />
         )}
-
         {currentStep === 'layout' && (
           <FrameLayoutScreen
             selectedLayout={selectedLayout}
             onSelectLayout={handleSelectLayout}
-            onContinue={handleContinueToCamera}
+            onContinue={() => setCurrentStep('camera')}
             onBack={() => setCurrentStep('start')}
           />
         )}
-
         {currentStep === 'camera' && (
           <CameraScreen
             layout={selectedLayout}
@@ -105,29 +87,27 @@ export const App: React.FC = () => {
             onAddShot={handleAddShot}
             onRemoveShot={handleRemoveShot}
             onRetakeAll={handleRetakeAll}
-            onContinue={handleContinueToCustomize}
+            onContinue={() => setCurrentStep('customize')}
             onBack={() => setCurrentStep('layout')}
           />
         )}
-
         {currentStep === 'customize' && (
           <CustomizeScreen
             layout={selectedLayout}
             shots={capturedShots}
             settings={customizationSettings}
             onUpdateSettings={setCustomizationSettings}
-            onContinue={handleContinueToDownload}
+            onContinue={() => setCurrentStep('download')}
             onBack={() => setCurrentStep('camera')}
           />
         )}
-
         {currentStep === 'download' && (
           <DownloadScreen
             layout={selectedLayout}
             shots={capturedShots}
             settings={customizationSettings}
             onReset={handleReset}
-            onBackToEdit={handleBackToEdit}
+            onBackToEdit={() => setCurrentStep('customize')}
           />
         )}
       </main>

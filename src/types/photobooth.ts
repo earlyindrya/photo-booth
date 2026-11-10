@@ -1,12 +1,11 @@
 export type StepId = 'start' | 'layout' | 'camera' | 'customize' | 'download';
 
 export type LayoutId = 
+  | 'polkadot-4cut' 
+  | 'zine-recap' 
   | 'classic-4cut' 
-  | 'zine-moodboard' 
-  | 'mac-window-strip' 
-  | 'vintage-baroque' 
-  | 'grid-2x2' 
-  | 'cinematic-wide';
+  | 'polaroid-2x2' 
+  | 'wide-hero';
 
 export interface LayoutConfig {
   id: LayoutId;
@@ -22,12 +21,11 @@ export interface LayoutConfig {
 
 export type FilterId = 
   | 'normal' 
-  | 'warm-natural'
-  | 'april-dream' 
-  | 'vintage-ugc' 
-  | 'noir-editorial' 
-  | 'capsule-sky' 
-  | 'retro-90s';
+  | 'soft-glow' 
+  | 'vintage-35mm' 
+  | 'noir-contrast' 
+  | 'disposable-90s' 
+  | 'cool-digicam';
 
 export interface FilterConfig {
   id: FilterId;
@@ -38,24 +36,24 @@ export interface FilterConfig {
 }
 
 export type FrameThemeId = 
-  | 'cream-paper' 
-  | 'retro-stripes' 
-  | 'y2k-mac' 
-  | 'zine-cherry' 
-  | 'sky-capsule' 
-  | 'baroque-gold' 
-  | 'studio-noir';
+  | 'cherry-polkadot' 
+  | 'noir-polkadot' 
+  | 'blush-polkadot' 
+  | 'minimal-white' 
+  | 'linen-paper' 
+  | 'obsidian-noir';
 
-export type FontStyleId = 'serif' | 'sans' | 'script' | 'mono';
+export type FontStyleId = 'grotesk' | 'serif' | 'script' | 'mono';
 
 export interface FrameThemeConfig {
   id: FrameThemeId;
   name: string;
   bgClass: string;
-  canvasBg: string | string[]; // Single hex or array for linear gradient
+  canvasBg: string | string[];
   textColor: string;
   subtextColor: string;
   borderClass: string;
+  dotColor?: string;
   accentBadge?: string;
 }
 
@@ -78,8 +76,9 @@ export interface CustomizationSettings {
   fontStyle: FontStyleId;
   title: string;
   subtitle: string;
+  editionText: string;
   showDateStamp: boolean;
-  showWatermark: boolean;
+  showPolkaDots: boolean;
   frameBorderRadius: number; // px
   stickers: StickerItem[];
 }
